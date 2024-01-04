@@ -4,4 +4,4 @@ ktor:
       - io.github.jsixface.codexvert.ApplicationKt.module
   deployment:
     port: "$PORT:8080"
-    host: "$BIND:0.0.0.0"
+    host: "$BIND:localhost"

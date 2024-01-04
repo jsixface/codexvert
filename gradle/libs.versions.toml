@@ -1,17 +1,26 @@
 [versions]
-compose = "1.5.4"
-compose-compiler = "1.5.6"
-compose-plugin = "1.6.0-alpha01"
+compose = "1.6.0-beta01"
+compose-compiler = "1.5.6-dev1-kt2.0.0-Beta2"
+compose-plugin = "1.6.0-beta01"
 junit = "4.13.2"
-kotlin = "1.9.21"
-ktor = "2.3.7"
+kmpNativeCoroutines = "1.0.0-ALPHA-24-kotlin-2.0.0-Beta2"
+koin = "3.6.0-wasm-alpha2"
+kotlin = "2.0.0-Beta2"
+ksp = "2.0.0-Beta2-1.0.16"
+ktor = "3.0.0-wasm2"
+ktor-beta = "3.0.0-beta-1"
+kxCoroutine = "1.8.0-RC2"
+kxDateTime = "0.5.0"
+kxSerialization = "1.6.2"
 logback = "1.4.14"
-koin = "3.5.3"
-ksp = "1.8.21-1.0.11"
+napier = "2.7.1"
 
 [libraries]
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
 kotlin-test-junit = { module = "org.jetbrains.kotlin:kotlin-test-junit", version.ref = "kotlin" }
+kotlinx-datetime = { module = "org.jetbrains.kotlinx:kotlinx-datetime", version.ref = "kxDateTime" }
+kotlinx-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kxSerialization" }
+
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 compose-ui = { module = "androidx.compose.ui:ui", version.ref = "compose" }
 compose-ui-tooling = { module = "androidx.compose.ui:ui-tooling", version.ref = "compose" }
@@ -19,27 +28,51 @@ compose-ui-tooling-preview = { module = "androidx.compose.ui:ui-tooling-preview"
 compose-foundation = { module = "androidx.compose.foundation:foundation", version.ref = "compose" }
 compose-material = { module = "androidx.compose.material:material", version.ref = "compose" }
 logback = { module = "ch.qos.logback:logback-classic", version.ref = "logback" }
+napier = { module = "io.github.aakira:napier", version.ref = "napier" }
+
+kotlinx-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "kxCoroutine" }
+kotlinx-coroutines-swing = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-swing", version.ref = "kxCoroutine" }
+
 ktor-server-core = { module = "io.ktor:ktor-server-core-jvm", version.ref = "ktor" }
 ktor-server-config-yaml = { module = "io.ktor:ktor-server-config-yaml", version.ref = "ktor" }
 ktor-server-netty = { module = "io.ktor:ktor-server-netty-jvm", version.ref = "ktor" }
 ktor-server-content-negotiation = { module = "io.ktor:ktor-server-content-negotiation", version.ref = "ktor" }
 ktor-server-tests = { module = "io.ktor:ktor-server-tests-jvm", version.ref = "ktor" }
-ktor-cbor = { module = "io.ktor:ktor-serialization-kotlinx-cbor", version.ref = "ktor" }
+ktor-server-resources = { module = "io.ktor:ktor-server-resources", version.ref = "ktor" }
+ktor-resources = { module = "io.ktor:ktor-resources", version.ref = "ktor" }
+ktor-client-core = { module = "io.ktor:ktor-client-core", version.ref = "ktor" }
+ktor-client-cio = { module = "io.ktor:ktor-client-cio", version.ref = "ktor" }
+ktor-client-js = { module = "io.ktor:ktor-client-js", version.ref = "ktor" }
+ktor-client-logging = { module = "io.ktor:ktor-client-logging", version.ref = "ktor" }
+ktor-client-resources = { module = "io.ktor:ktor-client-resources", version.ref = "ktor" }
+ktor-client-content-negotiation = { module = "io.ktor:ktor-client-content-negotiation", version.ref = "ktor" }
+ktor-serialization-kotlinx-json = { module = "io.ktor:ktor-serialization-kotlinx-json", version.ref = "ktor" }
+ktor-serialization-kotlinx-cbor = { module = "io.ktor:ktor-serialization-kotlinx-cbor", version.ref = "ktor" }
 
 koin-test = { module = "io.insert-koin:koin-test", version.ref = "koin" }
 koin-test-junit4 = { module = "io.insert-koin:koin-test-junit4", version.ref = "koin" }
 koin-core = { module = "io.insert-koin:koin-core", version.ref = "koin" }
 koin-ktor = { module = "io.insert-koin:koin-ktor", version.ref = "koin" }
+koin-compose = { module = "io.insert-koin:koin-compose", version.ref = "koin" }
 koin-log = { module = "io.insert-koin:koin-logger-slf4j", version.ref = "koin" }
 
 [bundles]
 koin-server = ["koin-core", "koin-ktor", "koin-log"]
+koin-client = ["koin-core", "koin-compose"]
 koin-test = ["koin-test", "koin-test-junit4"]
-ktor-server = ["ktor-server-core", "ktor-server-netty",
-    "ktor-server-config-yaml", "ktor-cbor", "ktor-server-content-negotiation"]
+
+ktor-client = ["ktor-client-core", "ktor-client-logging", "ktor-client-content-negotiation",
+    "ktor-serialization-kotlinx-cbor", "ktor-client-resources"]
+ktor-server = ["ktor-server-core", "ktor-server-netty", "ktor-server-resources",
+    "ktor-server-config-yaml", "ktor-serialization-kotlinx-json", "ktor-serialization-kotlinx-cbor",
+    "ktor-server-content-negotiation"]
+
 
 [plugins]
 jetbrainsCompose = { id = "org.jetbrains.compose", version.ref = "compose-plugin" }
+kmpNativeCoroutines = { id = "com.rickclephas.kmp.nativecoroutines", version.ref = "kmpNativeCoroutines" }
 kotlinJvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
-ktor = { id = "io.ktor.plugin", version.ref = "ktor" }
 kotlinMultiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
+kotlinSerialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
+ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
+ktor = { id = "io.ktor.plugin", version.ref = "ktor-beta" }
