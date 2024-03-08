@@ -57,7 +57,7 @@ jobs:
       - name: Build and push Docker image
         uses: docker/build-push-action@v5
         with:
-          context: server
+          context: "{{defaultContext}}:server"
           file: Dockerfile
           push: true
           labels: ${{ steps.meta.outputs.labels }}
