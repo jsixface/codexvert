@@ -146,7 +146,7 @@ object HomeScreen : Screen {
     fun PageContent(list: List<VideoFile>, videoSelected: (VideoFile) -> Unit, onRefresh: () -> Unit) {
         val filteredVideos =
             list.filter {
-                it.fileName.contains(filteredName)
+                it.fileName.contains(filteredName, ignoreCase = true)
                     && it.videos.any { v -> if (filteredVideoCodec != "") v.codec == filteredVideoCodec else true }
                     && it.audios.any { a -> if (filteredAudioCodec != "") a.codec == filteredAudioCodec else true }
             }
