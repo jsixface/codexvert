@@ -33,6 +33,9 @@ jobs:
           distribution: 'temurin'
           cache: gradle
 
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v3
+
       - name: Build with Gradle
         run: ./gradlew distTar
 
@@ -54,10 +57,17 @@ jobs:
         with:
           images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
 
+      - name: Copy artifacts to Docker build context
+        run: |
+          mkdir -p docker-context
+          cp -r server docker-context/
+          ls -la docker-context/
+          tree docker-context/
+
       - name: Build and push Docker image
         uses: docker/build-push-action@v5
         with:
-          context: "{{defaultContext}}:server"
+          context: docker-context
           file: Dockerfile
           push: true
           labels: ${{ steps.meta.outputs.labels }}
