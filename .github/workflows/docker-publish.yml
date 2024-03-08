@@ -37,7 +37,7 @@ jobs:
         uses: gradle/actions/setup-gradle@v3
 
       - name: Build with Gradle
-        run: ./gradlew distTar
+        run: ./gradlew buildFatJar
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3

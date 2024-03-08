@@ -11,4 +11,4 @@ EXPOSE 8080
 ADD server/static /app/static
 ADD server/build/libs/server-all.jar /app
 
-ENTRYPOINT java -jar /app/server-all.jar
+CMD java -jar /app/server-all.jar
