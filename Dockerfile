@@ -1,14 +1,15 @@
 FROM eclipse-temurin:17-jre-alpine
 
-RUN apk add --no-cache ffmpeg && \
-    mkdir /app
-
 ENV BIND=0.0.0.0
-
-WORKDIR /app
 EXPOSE 8080
 
-ADD server/static /app/static
+RUN mkdir /app
 ADD server/build/libs/server-all.jar /app
+ADD server/static /app/static
+
+RUN apk add --no-cache ffmpeg && \
+    chown -R 1000 /app
+WORKDIR /app
+ENV HOME=/app
 
 CMD java -jar /app/server-all.jar
