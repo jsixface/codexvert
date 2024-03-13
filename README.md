@@ -9,6 +9,15 @@ CodeXvert is a modern web application built with Kotlin Multiplatform that simpl
 - **Transcoding**: Convert between different video and audio codecs with a simple interface. Supported codecs include H.264, VP9, AAC, MP3, Opus, and Vorbis (among others).
 - **Multi-Platform Support**: CodeXvert is built with Kotlin Multiplatform, allowing it to run on the Web, Desktop, and Server environments.
 
+## Screenshots
+
+### Video Files
+![Video Files](docs/1_video_files.png)
+
+### Settings
+![Settings](docs/2_settings.png)
+
+
 ## Getting Started
 
 To get started with CodeXvert, you can either run the application locally or deploy the Docker container.
