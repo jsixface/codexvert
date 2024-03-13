@@ -1,24 +1,36 @@
-This is a Kotlin Multiplatform project targeting Web, Desktop, Server.
+# CodeXvert - Manage and Transcode Your Video Library
 
-* `/composeApp` is for code that will be shared across your Compose Multiplatform applications.
-  It contains several subfolders:
-  - `commonMain` is for code that’s common for all targets.
-  - Other folders are for Kotlin code that will be compiled for only the platform indicated in the folder name.
-    For example, if you want to use Apple’s CoreCrypto for the iOS part of your Kotlin app,
-    `iosMain` would be the right folder for such calls.
+CodeXvert is a modern web application built with Kotlin Multiplatform that simplifies managing and transcoding your video library. It provides a user-friendly interface to browse your videos, filter them by codecs, and convert between different video and audio codecs with ease.
 
-* `/server` is for the Ktor server application.
+## Features
 
-* `/shared` is for the code that will be shared between all targets in the project.
-  The most important subfolder is `commonMain`. If preferred, you can add code to the platform-specific folders here too.
+- **Video Library Management**: Organize and search your video files with support for various file extensions like AVI, MP4, MKV, and MPEG4.
+- **Codec Filtering**: Filter your videos based on video and audio codecs for better organization and easy identification.
+- **Transcoding**: Convert between different video and audio codecs with a simple interface. Supported codecs include H.264, VP9, AAC, MP3, Opus, and Vorbis (among others).
+- **Multi-Platform Support**: CodeXvert is built with Kotlin Multiplatform, allowing it to run on the Web, Desktop, and Server environments.
 
+## Getting Started
 
-Learn more about [Kotlin Multiplatform](https://www.jetbrains.com/help/kotlin-multiplatform-dev/get-started.html),
-[Compose Multiplatform](https://github.com/JetBrains/compose-multiplatform/#compose-multiplatform),
-[Kotlin/Wasm](https://kotl.in/wasm/)…
+To get started with CodeXvert, you can either run the application locally or deploy the Docker container.
 
-**Note:** Compose/Web is Experimental and may be changed at any time. Use it only for evaluation purposes.
-We would appreciate your feedback on Compose/Web and Kotlin/Wasm in the public Slack channel [#compose-web](https://slack-chats.kotlinlang.org/c/compose-web).
-If you face any issues, please report them on [GitHub](https://github.com/JetBrains/compose-multiplatform/issues).
+### Running Locally
 
-You can open the web application by running the `:composeApp:wasmJsBrowserDevelopmentRun` Gradle task.
+1. Clone the repository: `git clone https://github.com/jsixface/codexvert.git`
+2. Navigate to the project directory: `cd codexvert`
+3. Build the project: `./gradlew build`
+4. Run the web application: `./gradlew :server:run`
+5. Access the application in your browser at `http://localhost:8080`
+
+### Docker Deployment
+
+CodeXvert is available as a Docker image on the GitHub Container Registry. You can pull and run the latest image with the following command:
+
+```bash
+docker run -d -p 8080:8080 ghcr.io/jsixface/codexvert:latest
+```
+This will start the CodeXvert application and expose it on http://localhost:8080.
+
+## License
+
+CodeXvert is released under the AGPL-3.0 License.
+
