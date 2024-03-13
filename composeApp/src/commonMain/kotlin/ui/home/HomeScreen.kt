@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -53,7 +54,7 @@ object HomeScreen : Screen {
     private var selectedVideo by mutableStateOf<VideoFile?>(null)
     private var showFileDetails by mutableStateOf(false)
     private val bottomPad = Modifier.padding(0.dp, 0.dp, 0.dp, 8.dp)
-    private val sidePad = Modifier.padding(0.dp, 16.dp)
+    private val sidePad = Modifier.padding(8.dp, 0.dp, 0.dp, 0.dp)
 
     override val name: String
         get() = "Home"
@@ -158,16 +159,9 @@ object HomeScreen : Screen {
                     label = { Text("File name") },
                     leadingIcon = { Icon(Icons.Rounded.Search, contentDescription = "Search") })
                 val videoOptions = list.asSequence().flatMap { it.videos }.map { it.codec }.toSet().toList().sorted()
-                FilterOptions(
-                    "Video Codecs", videoOptions,
-                    filteredVideoCodec
-                ) { filteredVideoCodec = it }
+                FilterOptions("Video Codecs", videoOptions, filteredVideoCodec) { filteredVideoCodec = it }
                 val audioOptions = list.asSequence().flatMap { it.audios }.map { it.codec }.toSet().toList().sorted()
-                FilterOptions(
-                    "Audio Codecs", audioOptions,
-                    filteredAudioCodec
-                ) { filteredAudioCodec = it }
-
+                FilterOptions("Audio Codecs", audioOptions, filteredAudioCodec) { filteredAudioCodec = it }
                 IconButton(modifier = sidePad, onClick = onRefresh) {
                     Icon(Icons.Rounded.Refresh, contentDescription = "Refresh")
                 }
@@ -210,7 +204,7 @@ object HomeScreen : Screen {
         onSelect: (String) -> Unit
     ) {
         var expanded by remember { mutableStateOf(false) }
-        ExposedDropdownMenuBox(expanded, onExpandedChange = { expanded = it }, modifier = sidePad) {
+        ExposedDropdownMenuBox(expanded, onExpandedChange = { expanded = it }, modifier = sidePad.height(32.dp)) {
             TextField(
                 // The `menuAnchor` modifier must be passed to the text field for correctness.
                 modifier = sidePad.menuAnchor(),

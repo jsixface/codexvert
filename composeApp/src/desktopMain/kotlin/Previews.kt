@@ -1,12 +1,19 @@
 
 import androidx.compose.desktop.ui.tooling.preview.Preview
 import androidx.compose.runtime.Composable
-import io.github.jsixface.common.*
-import ui.*
+import io.github.jsixface.common.ConversionJob
+import io.github.jsixface.common.JobStatus
+import io.github.jsixface.common.MediaTrack
+import io.github.jsixface.common.TrackType
+import io.github.jsixface.common.VideoFile
+import kotlin.random.Random
+import ui.BackendDialogContent
+import ui.BackupsScreen
+import ui.JobsScreen
+import ui.SettingsScreen
 import ui.home.FileDetails
 import ui.home.HomeScreen
 import ui.theme.AppTheme
-import kotlin.random.Random
 
 
 private val videos = listOf(
@@ -80,23 +87,6 @@ fun seeBackups() {
 fun previewBackendDialog() {
     AppTheme {
         BackendDialogContent("helium.home", {}, {})
-    }
-}
-
-
-@Composable
-@Preview
-fun previewMainScreen() {
-    AppTheme {
-        MainScreen()
-    }
-}
-
-@Preview
-@Composable
-private fun seeHomeScreen() {
-    AppTheme {
-        HomeScreen.content()
     }
 }
 
