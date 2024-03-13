@@ -39,6 +39,7 @@ kotlin {
             implementation(compose.components.resources)
             implementation(projects.shared)
             implementation(libs.kotlinx.coroutines.core)
+            implementation(libs.kotlinx.datetime)
             implementation(libs.napier)
             implementation(libs.bundles.koin.client)
             implementation(libs.bundles.ktor.client)
@@ -62,7 +63,7 @@ compose {
 
 compose.desktop {
     application {
-        mainClass = "MainKt"
+        mainClass = "DesktopMain"
 
         nativeDistributions {
             targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)

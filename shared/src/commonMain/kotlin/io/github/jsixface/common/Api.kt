@@ -10,6 +10,12 @@ sealed interface Api {
         data class Video(val parent: Videos = Videos, val path: String?) : Api
     }
 
+    @Resource("/backups")
+    data object Backups: Api {
+        @Resource("/backup")
+        data class Backup(val parent: Backups = Backups, val path: String) : Api
+    }
+
     @Resource("/settings")
     data object Settings : Api
 

@@ -1,18 +1,12 @@
+
 import androidx.compose.desktop.ui.tooling.preview.Preview
 import androidx.compose.runtime.Composable
-import io.github.jsixface.common.ConversionJob
-import io.github.jsixface.common.JobStatus
-import io.github.jsixface.common.MediaTrack
-import io.github.jsixface.common.TrackType
-import io.github.jsixface.common.VideoFile
-import kotlin.random.Random
-import ui.BackendDialogContent
-import ui.JobsScreen
-import ui.MainScreen
-import ui.SettingsScreen
+import io.github.jsixface.common.*
+import ui.*
 import ui.home.FileDetails
 import ui.home.HomeScreen
 import ui.theme.AppTheme
+import kotlin.random.Random
 
 
 private val videos = listOf(
@@ -69,6 +63,15 @@ fun seeJobs() {
     AppTheme {
         println(jobs.size)
         JobsScreen.JobContent(jobs, onDelete = {}, onClear = {})
+    }
+}
+
+@Composable
+@Preview
+fun seeBackups() {
+    AppTheme {
+        val backups = listOf("The-Boys-S03E01-Payback-WEBDL-1080p.mkv.1710158838.bkp" )
+        BackupsScreen.BackupContent(backups, {}, {})
     }
 }
 

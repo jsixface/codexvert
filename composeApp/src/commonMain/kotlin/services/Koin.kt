@@ -1,18 +1,16 @@
 package services
 
 import Backend
-import io.ktor.client.HttpClient
-import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
-import io.ktor.client.plugins.defaultRequest
-import io.ktor.client.plugins.logging.DEFAULT
-import io.ktor.client.plugins.logging.LogLevel
-import io.ktor.client.plugins.logging.Logger
-import io.ktor.client.plugins.logging.Logging
-import io.ktor.client.plugins.resources.Resources
-import io.ktor.serialization.kotlinx.cbor.cbor
+import io.ktor.client.*
+import io.ktor.client.plugins.*
+import io.ktor.client.plugins.contentnegotiation.*
+import io.ktor.client.plugins.logging.*
+import io.ktor.client.plugins.resources.*
+import io.ktor.serialization.kotlinx.cbor.*
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.cbor.Cbor
 import org.koin.dsl.module
+import viewmodels.BackupScreenViewModel
 import viewmodels.JobsScreenModel
 import viewmodels.SettingsScreenModel
 import viewmodels.VideoListViewModel
@@ -23,6 +21,7 @@ object Koin {
 
         factory { SettingsScreenModel(client = get()) }
         factory { JobsScreenModel(client = get()) }
+        factory { BackupScreenViewModel(client = get()) }
         factory { VideoListViewModel(client = get()) }
     }
 
