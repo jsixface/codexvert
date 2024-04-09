@@ -6,7 +6,7 @@ import kotlinx.datetime.toLocalDateTime
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
-val AudioCodecs = listOf("aac", "ac3", "mp3")
+val AudioCodecs = listOf("aac", "libopus", "mp3")
 val VideoCodecs = listOf("libx265", "libx264", "mpeg4")
 val SubtitleCodecs = listOf("srt")
 
