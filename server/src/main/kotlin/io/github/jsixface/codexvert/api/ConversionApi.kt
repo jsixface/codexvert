@@ -5,28 +5,21 @@ import io.github.jsixface.common.Conversion
 import io.github.jsixface.common.MediaTrack
 import io.github.jsixface.common.VideoFile
 import io.ktor.utils.io.CancellationException
-import java.io.File
-import java.io.InputStream
-import java.io.UncheckedIOException
-import java.nio.file.Files
-import java.util.UUID
-import kotlin.io.path.Path
-import kotlin.time.Duration
-import kotlin.time.Duration.Companion.milliseconds
-import kotlin.time.Duration.Companion.seconds
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.SupervisorJob
-import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.delay
+import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.isActive
-import kotlinx.coroutines.launch
 import kotlinx.datetime.Clock.System
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
+import java.io.File
+import java.io.InputStream
+import java.io.UncheckedIOException
+import java.nio.file.Files
+import java.util.*
+import kotlin.io.path.Path
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.milliseconds
+import kotlin.time.Duration.Companion.seconds
 
 class ConversionApi(settingsApi: SettingsApi) {
     private val logger = logger()
@@ -67,7 +60,7 @@ class ConversionApi(settingsApi: SettingsApi) {
         val convJob = ConvertingJob(
             videoFile = file,
             convSpecs = convSpecs,
-            outFile = File(newDir, file.fileName),
+            outFile = File(newDir, file.fileName), // TODO convert the output file always to mkv
             job = null,
             progress = MutableStateFlow(0),
             jobId = jobId
@@ -176,9 +169,8 @@ class ConversionApi(settingsApi: SettingsApi) {
                 is Conversion.Convert -> result += listOf(
                     "-map",
                     "0:${track.index}",
-                    "-codec:$i",
-                    conv.codec
-                )
+                    "-codec:$i"
+                ) + conv.codec.ffmpegParams
             }
         }
         return result

@@ -6,9 +6,17 @@ import kotlinx.datetime.toLocalDateTime
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
-val AudioCodecs = listOf("aac", "libopus", "mp3")
-val VideoCodecs = listOf("libx265", "libx264", "mpeg4")
-val SubtitleCodecs = listOf("srt")
+enum class Codec(
+    val type: TrackType,
+    val ffmpegParams: List<String> = emptyList(),
+) {
+    AAC(TrackType.Audio, listOf("aac")),
+    Opus(TrackType.Audio, listOf("libopus", "-b:a", "128K")),
+    MP3(TrackType.Audio, listOf("mp3", "-b:a", "128K")),
+    HEVC(TrackType.Video, listOf("libx265")),
+    H264(TrackType.Video, listOf("libx264")),
+    MPEG4(TrackType.Video, listOf("mpeg4")),
+}
 
 @Serializable
 sealed class Conversion {
@@ -19,7 +27,7 @@ sealed class Conversion {
     data object Drop : Conversion()
 
     @Serializable
-    data class Convert(val codec: String) : Conversion()
+    data class Convert(val codec: Codec) : Conversion()
 }
 
 enum class TrackType(val stream: String) {
@@ -28,19 +36,19 @@ enum class TrackType(val stream: String) {
 
 @Serializable
 data class MediaTrack(
-        val type: TrackType,
-        val index: Int,
-        val codec: String
+    val type: TrackType,
+    val index: Int,
+    val codec: String
 )
 
 @Serializable
 data class VideoFile(
-        val path: String,
-        val fileName: String,
-        val modifiedTime: Long,
-        val audios: List<MediaTrack> = listOf(),
-        val videos: List<MediaTrack> = listOf(),
-        val subtitles: List<MediaTrack> = listOf()
+    val path: String,
+    val fileName: String,
+    val modifiedTime: Long,
+    val audios: List<MediaTrack> = listOf(),
+    val videos: List<MediaTrack> = listOf(),
+    val subtitles: List<MediaTrack> = listOf()
 ) {
     val videoInfo: String
         get() = videos.joinToString { it.codec }
@@ -54,7 +62,7 @@ data class VideoFile(
     val modified: String
         get() {
             val dateTime = Instant.fromEpochMilliseconds(modifiedTime)
-                    .toLocalDateTime(TimeZone.currentSystemDefault())
+                .toLocalDateTime(TimeZone.currentSystemDefault())
             return "${dateTime.date} ${dateTime.time}"
         }
 
@@ -62,15 +70,15 @@ data class VideoFile(
 
 @Serializable
 data class MediaStream(
-        val index: Int,
-        @SerialName("codec_name")
-        val codecName: String = "",
-        @SerialName("codec_type")
-        val codecType: String,
-        val channels: Int = 1
+    val index: Int,
+    @SerialName("codec_name")
+    val codecName: String = "",
+    @SerialName("codec_type")
+    val codecType: String,
+    val channels: Int = 1
 )
 
 @Serializable
 data class MediaProbeInfo(
-        val streams: List<MediaStream>
+    val streams: List<MediaStream>
 )
