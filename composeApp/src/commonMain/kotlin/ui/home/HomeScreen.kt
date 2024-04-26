@@ -9,6 +9,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.rounded.ArrowDropDown
+import androidx.compose.material.icons.rounded.Close
 import androidx.compose.material.icons.rounded.Refresh
 import androidx.compose.material.icons.rounded.Search
 import androidx.compose.material3.*
@@ -143,6 +144,16 @@ object HomeScreen : Screen {
                 FilterOptions("Audio Codecs", audioOptions, filteredAudioCodec) { filteredAudioCodec = it }
                 IconButton(modifier = sidePad, onClick = onRefresh) {
                     Icon(Icons.Rounded.Refresh, contentDescription = "Refresh")
+                }
+                // Clear filters
+                if (filteredName.isNotEmpty() || filteredAudioCodec.isNotEmpty() || filteredVideoCodec.isNotEmpty()) {
+                    IconButton(onClick = {
+                        filteredName = ""
+                        filteredAudioCodec = ""
+                        filteredVideoCodec = ""
+                    }) {
+                        Icon(Icons.Rounded.Close, contentDescription = "Clear filters")
+                    }
                 }
             }
             Row(modifier = bottomPad.fillMaxSize()) {
