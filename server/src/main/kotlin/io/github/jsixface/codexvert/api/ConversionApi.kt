@@ -139,7 +139,7 @@ class ConversionApi(settingsApi: SettingsApi) {
         updates.value = 100
     }
 
-    internal fun buildCommand(
+    private fun buildCommand(
         file: VideoFile,
         convSpecs: List<Pair<MediaTrack, Conversion>>,
         outFile: File
@@ -148,13 +148,16 @@ class ConversionApi(settingsApi: SettingsApi) {
         "-hide_banner",
         "-i",
         file.path,
-        *conversionParams(convSpecs).toTypedArray(),
+        *conversionParams(convSpecs, file).toTypedArray(),
         outFile.absolutePath
     )
 
-    internal fun conversionParams(convSpecs: List<Pair<MediaTrack, Conversion>>): List<String> {
+    private fun conversionParams(convSpecs: List<Pair<MediaTrack, Conversion>>, file: VideoFile): List<String> {
         val result = mutableListOf<String>()
-        convSpecs.forEachIndexed { i, (track, conv) ->
+        val subTitleWithoutSpecs =
+            file.subtitles.filter { convSpecs.none { c -> c.first == it } }.map { it to Conversion.Copy }
+        val allConversion = convSpecs + subTitleWithoutSpecs
+        allConversion.forEachIndexed { i, (track, conv) ->
 
             when (conv) {
                 Conversion.Copy -> result += listOf(
