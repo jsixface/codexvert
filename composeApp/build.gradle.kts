@@ -2,16 +2,14 @@ import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 import org.jetbrains.kotlin.gradle.targets.js.dsl.ExperimentalWasmDsl
 
 plugins {
+    alias(libs.plugins.compose.compiler)
     alias(libs.plugins.kotlinMultiplatform)
     alias(libs.plugins.jetbrainsCompose)
     alias(libs.plugins.kotlinSerialization)
     alias(libs.plugins.ksp)
-    alias(libs.plugins.kmpNativeCoroutines)
 }
 
-compose.experimental {
-    web.application {}
-}
+
 kotlin {
     @OptIn(ExperimentalWasmDsl::class)
     wasmJs {
@@ -54,11 +52,6 @@ kotlin {
             implementation(libs.ktor.client.js)
         }
     }
-}
-
-compose {
-    kotlinCompilerPlugin.set(libs.versions.compose.compiler)
-    kotlinCompilerPluginArgs.add("suppressKotlinVersionCompatibilityCheck=${libs.versions.kotlin}")
 }
 
 compose.desktop {
