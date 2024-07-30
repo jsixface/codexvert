@@ -12,10 +12,10 @@ import io.ktor.http.contentType
 import io.ktor.http.isSuccess
 import kotlinx.coroutines.flow.flow
 import ui.model.ModelState
-import util.log
 import ui.model.ModelState.Error
 import ui.model.ModelState.Init
 import ui.model.ModelState.Success
+import util.log
 
 class SettingsScreenModel(private val client: HttpClient) {
 
@@ -33,15 +33,8 @@ class SettingsScreenModel(private val client: HttpClient) {
         }
     }
 
-    suspend fun save(locations: List<String>, extension: List<String>, workLocation: String) {
-        val settings = Settings(
-            libraryLocations = locations,
-            workspaceLocation = workLocation,
-            videoExtensions = extension
-        )
-        client.post(Api.Settings) {
-            contentType(ContentType.Application.Cbor)
-            setBody(settings)
-        }
+    suspend fun save(settings: Settings) = client.post(Api.Settings) {
+        contentType(ContentType.Application.Cbor)
+        setBody(settings)
     }
 }

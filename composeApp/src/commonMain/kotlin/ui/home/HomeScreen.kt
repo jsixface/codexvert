@@ -3,17 +3,32 @@ package ui.home
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.hoverable
 import androidx.compose.foundation.interaction.MutableInteractionSource
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.rounded.ArrowDropDown
 import androidx.compose.material.icons.rounded.Close
 import androidx.compose.material.icons.rounded.Refresh
 import androidx.compose.material.icons.rounded.Search
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -23,13 +38,14 @@ import kotlinx.coroutines.launch
 import org.koin.compose.koinInject
 import ui.model.ModelState
 import ui.model.Screen
+import ui.utils.ComboBox
 import viewmodels.VideoListViewModel
 
 
 object HomeScreen : Screen {
 
-    private var filteredAudioCodec by mutableStateOf("")
-    private var filteredVideoCodec by mutableStateOf("")
+    private var filteredAudioCodec by mutableStateOf<String?>(null)
+    private var filteredVideoCodec by mutableStateOf<String?>(null)
     private var filteredName by mutableStateOf("")
     private var selectedVideo by mutableStateOf<VideoFile?>(null)
     private var showFileDetails by mutableStateOf(false)
@@ -128,8 +144,8 @@ object HomeScreen : Screen {
         val filteredVideos =
             list.filter {
                 it.fileName.contains(filteredName, ignoreCase = true)
-                    && it.videos.any { v -> if (filteredVideoCodec != "") v.codec == filteredVideoCodec else true }
-                    && it.audios.any { a -> if (filteredAudioCodec != "") a.codec == filteredAudioCodec else true }
+                    && it.videos.any { v -> filteredVideoCodec?.let { fv -> v.codec == fv } ?: true }
+                    && it.audios.any { a -> filteredAudioCodec?.let { fa -> a.codec == fa } ?: true }
             }
         Column {
             Row(modifier = bottomPad.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
@@ -139,18 +155,18 @@ object HomeScreen : Screen {
                     label = { Text("File name") },
                     leadingIcon = { Icon(Icons.Rounded.Search, contentDescription = "Search") })
                 val videoOptions = list.asSequence().flatMap { it.videos }.map { it.codec }.toSet().toList().sorted()
-                FilterOptions("Video Codecs", videoOptions, filteredVideoCodec) { filteredVideoCodec = it }
+                ComboBox("Video Codecs", videoOptions, filteredVideoCodec) { filteredVideoCodec = it }
                 val audioOptions = list.asSequence().flatMap { it.audios }.map { it.codec }.toSet().toList().sorted()
-                FilterOptions("Audio Codecs", audioOptions, filteredAudioCodec) { filteredAudioCodec = it }
+                ComboBox("Audio Codecs", audioOptions, filteredAudioCodec) { filteredAudioCodec = it }
                 IconButton(modifier = sidePad, onClick = onRefresh) {
                     Icon(Icons.Rounded.Refresh, contentDescription = "Refresh")
                 }
                 // Clear filters
-                if (filteredName.isNotEmpty() || filteredAudioCodec.isNotEmpty() || filteredVideoCodec.isNotEmpty()) {
+                if (filteredName.isNotEmpty() || filteredAudioCodec != null || filteredVideoCodec != null) {
                     IconButton(onClick = {
                         filteredName = ""
-                        filteredAudioCodec = ""
-                        filteredVideoCodec = ""
+                        filteredAudioCodec = null
+                        filteredVideoCodec = null
                     }) {
                         Icon(Icons.Rounded.Close, contentDescription = "Clear filters")
                     }
@@ -179,51 +195,6 @@ object HomeScreen : Screen {
                     }
                     items(filteredVideos) { file ->
                         VideoRow(file) { videoSelected(it) }
-                    }
-                }
-            }
-        }
-    }
-
-    @OptIn(ExperimentalMaterial3Api::class)
-    @Composable
-    private fun FilterOptions(
-        title: String,
-        options: List<String>,
-        selected: String,
-        onSelect: (String) -> Unit
-    ) {
-        var expanded by remember { mutableStateOf(false) }
-        ExposedDropdownMenuBox(expanded, onExpandedChange = { expanded = it }, modifier = sidePad) {
-            TextField(
-                modifier = sidePad.menuAnchor(),
-                value = selected,
-                onValueChange = { },
-                readOnly = true,
-                label = { Text(title) },
-                colors = ExposedDropdownMenuDefaults.textFieldColors(),
-                trailingIcon = { Icon(Icons.Rounded.ArrowDropDown, contentDescription = "Select") },
-            )
-
-            if (options.isNotEmpty()) {
-                ExposedDropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
-                    DropdownMenuItem(
-                        text = { Text("None") },
-                        onClick = {
-                            onSelect("")
-                            expanded = false
-                        },
-                        contentPadding = ExposedDropdownMenuDefaults.ItemContentPadding,
-                    )
-                    options.forEach { codec ->
-                        DropdownMenuItem(
-                            text = { Text(codec) },
-                            onClick = {
-                                onSelect(codec)
-                                expanded = false
-                            },
-                            contentPadding = ExposedDropdownMenuDefaults.ItemContentPadding,
-                        )
                     }
                 }
             }

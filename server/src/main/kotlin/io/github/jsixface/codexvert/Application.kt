@@ -3,7 +3,6 @@ package io.github.jsixface.codexvert
 import io.github.jsixface.codexvert.plugins.configureHTTP
 import io.github.jsixface.codexvert.plugins.configureKoin
 import io.github.jsixface.codexvert.plugins.configureRouting
-import io.github.jsixface.codexvert.plugins.configureWatchers
 import io.ktor.server.application.Application
 import io.ktor.server.netty.EngineMain
 import org.slf4j.Logger
@@ -15,7 +14,6 @@ fun Application.module() {
     configureKoin()
     configureRouting()
     configureHTTP()
-    configureWatchers()
 }
 
 

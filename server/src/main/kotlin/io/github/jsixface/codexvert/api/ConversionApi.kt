@@ -5,8 +5,15 @@ import io.github.jsixface.common.Conversion
 import io.github.jsixface.common.MediaTrack
 import io.github.jsixface.common.VideoFile
 import io.ktor.utils.io.CancellationException
-import kotlinx.coroutines.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.isActive
+import kotlinx.coroutines.launch
 import kotlinx.datetime.Clock.System
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.TimeZone
@@ -15,17 +22,17 @@ import java.io.File
 import java.io.InputStream
 import java.io.UncheckedIOException
 import java.nio.file.Files
-import java.util.*
+import java.util.UUID
 import kotlin.io.path.Path
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 
-class ConversionApi(settingsApi: SettingsApi) {
+class ConversionApi {
     private val logger = logger()
     private val scope = CoroutineScope(Dispatchers.IO + SupervisorJob())
     val jobs = mutableListOf<ConvertingJob>()
-    private val workspace = File(settingsApi.getSettings().workspaceLocation)
+    private val workspace = File(SavedData.load().settings.workspaceLocation)
 
     init {
         if (workspace.isDirectory.not()) {

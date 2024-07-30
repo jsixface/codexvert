@@ -16,8 +16,8 @@ import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.sharp.Delete
 import androidx.compose.material3.Card
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.Divider
 import androidx.compose.material3.ElevatedButton
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedCard
@@ -37,11 +37,16 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import io.github.jsixface.common.Settings
 import kotlinx.coroutines.launch
 import org.koin.compose.koinInject
-import ui.model.Screen
 import ui.model.ModelState
+import ui.model.Screen
+import ui.utils.ComboBox
 import viewmodels.SettingsScreenModel
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.hours
+import kotlin.time.Duration.Companion.minutes
 
 object SettingsScreen : Screen {
 
@@ -73,6 +78,7 @@ object SettingsScreen : Screen {
                 var workspace by remember { mutableStateOf("") }
                 val extensions = remember { mutableStateListOf<String>() }
                 val locations = remember { mutableStateListOf<String>() }
+                var refreshDuration by remember { mutableStateOf<Duration?>(null) }
 
                 LaunchedEffect(Unit) {
                     scope.launch {
@@ -99,6 +105,7 @@ object SettingsScreen : Screen {
                                     }
                                     extensions.addAll(extsToAdd)
                                     workspace = settings.workspaceLocation
+                                    refreshDuration = settings.watchDuration
                                 }
                             }
                         }
@@ -119,19 +126,25 @@ object SettingsScreen : Screen {
                     }
                     Column {
                         ListEditor("Locations", locations, { locations.remove(it) }, { locations.add(it) })
-                        Divider()
+                        HorizontalDivider()
                         ListEditor("Extensions", extensions, { extensions.remove(it) }, { extensions.add(it) })
-                        Divider()
+                        HorizontalDivider()
                         OutlinedTextField(value = workspace,
                             onValueChange = { workspace = it },
                             modifier = padding,
                             label = { Text("Workspace Location") })
+                        ComboBox(
+                            title = "Media Scan Duration",
+                            options = listOf(1.minutes, 5.minutes, 15.minutes, 30.minutes, 1.hours),
+                            selected = refreshDuration
+                        ) { refreshDuration = it }
+
                     }
                     Row(modifier = Modifier.fillMaxSize()) {
                         Spacer(modifier = Modifier.weight(1f))
                         ElevatedButton(onClick = {
                             scope.launch {
-                                settingsModel.save(locations.toList(), extensions.toList(), workspace)
+                                settingsModel.save(Settings(locations, workspace, extensions, refreshDuration))
                             }
                         }, modifier = padding) {
                             Text("Save")

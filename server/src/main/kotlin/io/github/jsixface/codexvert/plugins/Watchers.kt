@@ -1,59 +1,69 @@
 package io.github.jsixface.codexvert.plugins
 
+import io.github.jsixface.codexvert.api.ConversionApi
 import io.github.jsixface.codexvert.api.SavedData
 import io.github.jsixface.codexvert.api.VideoApi
 import io.github.jsixface.codexvert.logger
-import io.ktor.server.application.Application
-import io.ktor.server.application.ApplicationStopped
-import io.ktor.server.application.ApplicationStopping
-import java.io.File
-import java.nio.file.Path
-import java.nio.file.Paths
-import java.nio.file.StandardWatchEventKinds.ENTRY_CREATE
-import java.nio.file.StandardWatchEventKinds.ENTRY_DELETE
-import java.nio.file.StandardWatchEventKinds.ENTRY_MODIFY
-import kotlin.io.path.pathString
+import io.github.jsixface.common.Codec
+import io.github.jsixface.common.Conversion
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
-import org.koin.ktor.ext.inject
+import kotlin.time.Duration
 
+class Watchers(private val videoApi: VideoApi, private val conversionApi: ConversionApi) {
+    private val logger = logger()
+    private var watchingJob: Job? = null
+    private val scope = CoroutineScope(Dispatchers.IO + SupervisorJob())
 
-fun Application.configureWatchers() {
-
-    val videoApi by inject<VideoApi>()
-    val logger = logger()
-
-    val savedData = SavedData.load()
-    val firstDir = savedData.settings.libraryLocations.firstOrNull() ?: return
-    try {
-        val watchService = Paths.get(firstDir).fileSystem.newWatchService()
-        monitor.subscribe(ApplicationStopping) { watchService.close() }
-
-        savedData.settings.libraryLocations.forEach {
-            Paths.get(it).register(watchService, ENTRY_CREATE, ENTRY_DELETE, ENTRY_MODIFY)
+    init {
+        // Start watching if the settings allow it
+        val savedData = SavedData.load()
+        savedData.settings.watchDuration?.let { duration ->
+            startWatching(duration)
         }
-        CoroutineScope(Dispatchers.Default).launch {
-            // Start the infinite polling loop
-            while (isActive) {
-                val key = withContext(Dispatchers.IO) { watchService.take() }
-                val directory = (key.watchable() as? Path) ?: continue
-                for (event in key.pollEvents()) {
-                    val path = (event.context() as? Path) ?: continue
-                    val eventFile = File(directory.toFile(), path.pathString)
-                    logger.info("file: ${eventFile.absolutePath} has event ${event.kind()}")
-                    videoApi.refreshDirs()
+    }
+
+    fun startWatching(interval: Duration) {
+        stopWatching()
+        logger.info("Starting the watcher")
+        watchingJob = scope.launch {
+            try {
+                while (isActive) {
+                    delay(interval)
+                    val changes = videoApi.refreshDirs()
+                    if (changes) {
+                        logger.info("Changes detected, refreshing data")
+                        processChanges()
+                    }
                 }
-                if (!key.reset()) {
-                    // Don't have the access to listen on this directory anymore.
-                    monitor.raise(ApplicationStopped, this@configureWatchers)
-                    break // loop
-                }
+            } catch (e: Exception) {
+                logger.error("Whoops!!", e)
             }
         }
-    } catch (e: Exception) {
-        logger.error("Whoops!!", e)
+    }
+
+    private fun processChanges() {
+        // Convert the files that has EAC3 or AC3 codec to AAC codec.
+        // Make sure those files are not already in the job queue.
+        val files = videoApi.getVideos()
+        files.values.forEach { videoFile ->
+            val dolbyTracks = videoFile.audios.filter { it.codec.lowercase() in listOf("eac3", "ac3") }
+            val job = conversionApi.jobs.find { it.videoFile.fileName == videoFile.fileName }
+            if (dolbyTracks.isNotEmpty() && job == null) {
+                val conversionSpecs = dolbyTracks.map { Pair(it, Conversion.Convert(Codec.AAC)) }
+                logger.info("Auto Converting for ${videoFile.fileName}")
+                conversionApi.startConversion(videoFile, conversionSpecs)
+            }
+        }
+    }
+
+    fun stopWatching() {
+        logger.info("Stopping the watcher")
+        watchingJob?.cancel()
     }
 }
