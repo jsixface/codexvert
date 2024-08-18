@@ -56,10 +56,9 @@ fun Route.videoRoutes() {
             return@post
         }
         logger.info("Converting the video: ${video.path}")
-        val data = call.receive<List<Pair<MediaTrack, Conversion>>>()
+        val data = call.receive<Map<MediaTrack, Conversion>>()
         logger.info("Got the data: $data")
         conversionApi.startConversion(videoFile, data)
         call.respond("OK")
-
     }
 }

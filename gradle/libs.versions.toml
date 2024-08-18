@@ -42,15 +42,35 @@ logback = { module = "ch.qos.logback:logback-classic", version.ref = "logback" }
 napier = { module = "io.github.aakira:napier", version.ref = "napier" }
 
 [bundles]
-koin-server = ["koin-core", "koin-ktor", "koin-log"]
-koin-client = ["koin-core", "koin-compose"]
-koin-test = ["koin-test", "koin-test-junit4"]
-
-ktor-client = ["ktor-client-core", "ktor-client-logging", "ktor-client-content-negotiation",
-    "ktor-serialization-kotlinx-cbor", "ktor-client-resources"]
-ktor-server = ["ktor-server-core", "ktor-server-netty", "ktor-server-resources",
-    "ktor-server-config-yaml", "ktor-serialization-kotlinx-json", "ktor-serialization-kotlinx-cbor",
-    "ktor-server-content-negotiation"]
+koin-server = [
+    "koin-core",
+    "koin-ktor",
+    "koin-log"
+]
+koin-client = [
+    "koin-core",
+    "koin-compose"
+]
+koin-test = [
+    "koin-test",
+    "koin-test-junit4"
+]
+ktor-client = [
+    "ktor-client-core",
+    "ktor-client-logging",
+    "ktor-client-content-negotiation",
+    "ktor-serialization-kotlinx-cbor",
+    "ktor-client-resources"
+]
+ktor-server = [
+    "ktor-server-core",
+    "ktor-server-netty",
+    "ktor-server-resources",
+    "ktor-server-config-yaml",
+    "ktor-serialization-kotlinx-json",
+    "ktor-serialization-kotlinx-cbor",
+    "ktor-server-content-negotiation"
+]
 
 
 [plugins]

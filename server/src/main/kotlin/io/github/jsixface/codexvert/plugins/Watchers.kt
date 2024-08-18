@@ -6,6 +6,7 @@ import io.github.jsixface.codexvert.api.VideoApi
 import io.github.jsixface.codexvert.logger
 import io.github.jsixface.common.Codec
 import io.github.jsixface.common.Conversion
+import io.github.jsixface.common.isDolby
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -52,10 +53,10 @@ class Watchers(private val videoApi: VideoApi, private val conversionApi: Conver
         // Make sure those files are not already in the job queue.
         val files = videoApi.getVideos()
         files.values.forEach { videoFile ->
-            val dolbyTracks = videoFile.audios.filter { it.codec.lowercase() in listOf("eac3", "ac3") }
+            val dolbyTracks = videoFile.audios.filter { it.isDolby() }
             val job = conversionApi.jobs.find { it.videoFile.fileName == videoFile.fileName }
             if (dolbyTracks.isNotEmpty() && job == null) {
-                val conversionSpecs = dolbyTracks.map { Pair(it, Conversion.Convert(Codec.AAC)) }
+                val conversionSpecs = dolbyTracks.associateWith { Conversion.Convert(Codec.AAC) }
                 logger.info("Auto Converting for ${videoFile.fileName}")
                 conversionApi.startConversion(videoFile, conversionSpecs)
             }

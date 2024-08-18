@@ -39,7 +39,7 @@ class VideoListViewModel(private val client: HttpClient) {
 
     suspend fun submitJob(videoFile: VideoFile, conversions: Map<MediaTrack, Conversion>) {
         client.post(Api.Videos.Video(path = videoFile.fileName)) {
-            setBody(conversions.entries.map { it.toPair() })
+            setBody(conversions)
             contentType(ContentType.Application.Cbor)
         }
     }

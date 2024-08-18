@@ -41,6 +41,8 @@ data class MediaTrack(
     val codec: String
 )
 
+fun MediaTrack.isDolby() = codec.lowercase() in listOf("ac3", "eac3")
+
 @Serializable
 data class VideoFile(
     val path: String,

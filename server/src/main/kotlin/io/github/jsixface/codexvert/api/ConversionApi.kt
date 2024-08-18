@@ -59,7 +59,7 @@ class ConversionApi {
         jobs.removeAll { it.progress.value == -1 || it.progress.value == 100 }
     }
 
-    fun startConversion(file: VideoFile, convSpecs: List<Pair<MediaTrack, Conversion>>): Boolean {
+    fun startConversion(file: VideoFile, convSpecs: Map<MediaTrack, Conversion>): Boolean {
         val jobId = UUID.randomUUID().toString()
         val newDir = File(workspace, jobId).apply { mkdirs() }
 
@@ -79,7 +79,7 @@ class ConversionApi {
 
     private suspend fun startJob(
         file: VideoFile,
-        convSpecs: List<Pair<MediaTrack, Conversion>>,
+        convSpecs: Map<MediaTrack, Conversion>,
         outFile: File,
         updates: MutableStateFlow<Int>
     ) = coroutineScope {
@@ -148,7 +148,7 @@ class ConversionApi {
 
     private fun buildCommand(
         file: VideoFile,
-        convSpecs: List<Pair<MediaTrack, Conversion>>,
+        convSpecs: Map<MediaTrack, Conversion>,
         outFile: File
     ): List<String> = listOf(
         "ffmpeg",
@@ -159,13 +159,12 @@ class ConversionApi {
         outFile.absolutePath
     )
 
-    private fun conversionParams(convSpecs: List<Pair<MediaTrack, Conversion>>, file: VideoFile): List<String> {
+    private fun conversionParams(convSpecs: Map<MediaTrack, Conversion>, file: VideoFile): List<String> {
         val result = mutableListOf<String>()
-        val subTitleWithoutSpecs =
-            file.subtitles.filter { convSpecs.none { c -> c.first == it } }.map { it to Conversion.Copy }
-        val allConversion = convSpecs + subTitleWithoutSpecs
-        allConversion.forEachIndexed { i, (track, conv) ->
-
+        val missingTracks = (file.subtitles + file.videos + file.audios).filter { it !in convSpecs.keys }
+        val copyTracks = missingTracks.map { it to Conversion.Copy }
+        val allConversion = convSpecs + copyTracks
+        allConversion.toList().forEachIndexed { i, (track, conv) ->
             when (conv) {
                 Conversion.Copy -> result += listOf(
                     "-map",
@@ -189,7 +188,7 @@ class ConversionApi {
 
 data class ConvertingJob(
     val videoFile: VideoFile,
-    val convSpecs: List<Pair<MediaTrack, Conversion>>,
+    val convSpecs: Map<MediaTrack, Conversion>,
     val outFile: File,
     var job: Job?,
     val progress: MutableStateFlow<Int> = MutableStateFlow(0),
