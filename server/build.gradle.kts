@@ -14,6 +14,7 @@ application {
 dependencies {
     implementation(projects.shared)
     implementation(libs.logback)
+    implementation(libs.logstash.logback.encoder)
     implementation(libs.bundles.ktor.server)
     implementation(libs.kotlinx.datetime)
     implementation(libs.kotlinx.json)
