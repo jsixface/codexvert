@@ -127,8 +127,8 @@ object JobsScreen : Screen {
                         when (job.status) {
                             Starting -> LinearProgressIndicator(modifier = progressPadding)
                             InProgress -> LinearProgressIndicator(
-                                progress = job.progress / 100.0f,
-                                modifier = progressPadding
+                                progress = { job.progress / 100.0f },
+                                modifier = progressPadding,
                             )
 
                             Completed -> Text(
