@@ -8,15 +8,8 @@ CodeXvert is a modern web application built with Kotlin Multiplatform that simpl
 - **Codec Filtering**: Filter your videos based on video and audio codecs for better organization and easy identification.
 - **Transcoding**: Convert between different video and audio codecs with a simple interface. Supported codecs include H.264, VP9, AAC, MP3, Opus, and Vorbis (among others).
 - **Multi-Platform Support**: CodeXvert is built with Kotlin Multiplatform, allowing it to run on the Web, Desktop, and Server environments.
-
-## Screenshots
-
-### Video Files
-![Video Files](docs/1_video_files.png)
-
-### Settings
-![Settings](docs/2_settings.png)
-
+- **Background Monitoring**: Automatically monitor and manage your video library in the background, ensuring your
+  library is always up-to-date.
 
 ## Getting Started
 
@@ -38,6 +31,14 @@ CodeXvert is available as a Docker image on the GitHub Container Registry. You c
 docker run -d -p 8080:8080 ghcr.io/jsixface/codexvert:latest
 ```
 This will start the CodeXvert application and expose it on http://localhost:8080.
+
+## Screenshots
+
+[//]: # (![Video Files]&#40;docs/1_video_files.png&#41;)
+<img src="docs/1_video_files.png" width="500">
+<img src="docs/2_video_options.png" width="500">
+<img src="docs/3_jobs.png" width="500">
+<img src="docs/2_settings.png" width="500">
 
 ## License
 
