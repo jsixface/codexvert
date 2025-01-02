@@ -20,7 +20,7 @@ dependencies {
     implementation(libs.kotlinx.json)
     implementation(libs.bundles.koin.server)
 
-    testImplementation(libs.ktor.server.tests)
+//    testImplementation(libs.ktor.server.tests)
     testImplementation(libs.kotlin.test.junit)
     testImplementation(libs.bundles.koin.test)
 }

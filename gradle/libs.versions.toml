@@ -1,21 +1,20 @@
 [versions]
-compose-plugin = "1.6.10"
-koin = "3.6.0-wasm-alpha2"
-kotlin = "2.0.0"
-kotlinx-coroutines = "1.8.1"
-kotlinx-datetime = "0.5.0"
-kotlinx-serialization = "1.6.2"
-ksp = "2.0.0-1.0.21"
-ktor = "3.0.0-wasm2"
-ktor-beta = "3.0.0-beta-1"
-logback = "1.4.14"
+compose-plugin = "1.7.3"
+koin = "4.1.0-Beta1"
+kotlin = "2.1.0"
+kotlinx-coroutines = "1.10.1"
+kotlinx-datetime = "0.6.1"
+kotlinx-serialization = "1.7.3"
+ksp = "2.1.0-1.0.29"
+ktor = "3.0.3"
+logback = "1.5.15"
 logstash-logback-encoder = "8.0"
 napier = "2.7.1"
 
 [libraries]
 koin-compose = { module = "io.insert-koin:koin-compose", version.ref = "koin" }
 koin-core = { module = "io.insert-koin:koin-core", version.ref = "koin" }
-koin-ktor = { module = "io.insert-koin:koin-ktor", version.ref = "koin" }
+koin-ktor = { module = "io.insert-koin:koin-ktor3", version.ref = "koin" }
 koin-log = { module = "io.insert-koin:koin-logger-slf4j", version.ref = "koin" }
 koin-test = { module = "io.insert-koin:koin-test", version.ref = "koin" }
 koin-test-junit4 = { module = "io.insert-koin:koin-test-junit4", version.ref = "koin" }
@@ -82,4 +81,4 @@ kotlinJvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
 kotlinMultiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
 kotlinSerialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
 ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
-ktor = { id = "io.ktor.plugin", version.ref = "ktor-beta" }
+ktor = { id = "io.ktor.plugin", version.ref = "ktor" }
