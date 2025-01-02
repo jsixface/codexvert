@@ -6,14 +6,14 @@ import io.github.jsixface.common.JobStatus
 import io.github.jsixface.common.MediaTrack
 import io.github.jsixface.common.TrackType
 import io.github.jsixface.common.VideoFile
-import kotlin.random.Random
 import ui.BackendDialogContent
-import ui.BackupsScreen
-import ui.JobsScreen
-import ui.SettingsScreen
+import ui.BackupContent
+import ui.JobContent
+import ui.ListEditor
 import ui.home.FileDetails
 import ui.home.HomeScreen
 import ui.theme.AppTheme
+import kotlin.random.Random
 
 
 private val videos = listOf(
@@ -60,7 +60,7 @@ private val jobs = videos.mapIndexed { i, v ->
 @Preview
 fun seeSetting() {
     AppTheme {
-        SettingsScreen.ListEditor("Elite list", listOf("One", "Two", "Three"), {}, {})
+        ListEditor("Elite list", listOf("One", "Two", "Three"), {}, {})
     }
 }
 
@@ -69,7 +69,7 @@ fun seeSetting() {
 fun seeJobs() {
     AppTheme {
         println(jobs.size)
-        JobsScreen.JobContent(jobs, onDelete = {}, onClear = {})
+        JobContent(jobs, onDelete = {}, onClear = {})
     }
 }
 
@@ -78,7 +78,7 @@ fun seeJobs() {
 fun seeBackups() {
     AppTheme {
         val backups = listOf("The-Boys-S03E01-Payback-WEBDL-1080p.mkv.1710158838.bkp" )
-        BackupsScreen.BackupContent(backups, {}, {})
+        BackupContent(backups, {}, {})
     }
 }
 

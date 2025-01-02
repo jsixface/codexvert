@@ -12,7 +12,6 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Inbox
 import androidx.compose.material.icons.sharp.Close
 import androidx.compose.material3.Card
 import androidx.compose.material3.ElevatedButton
@@ -43,24 +42,15 @@ import io.github.jsixface.common.JobStatus.Starting
 import kotlinx.coroutines.launch
 import org.koin.compose.koinInject
 import ui.model.ModelState
-import ui.model.Screen
 import viewmodels.JobsScreenModel
 
-object JobsScreen : Screen {
 
-    private val padding = Modifier.padding(16.dp)
+private val padding = Modifier.padding(16.dp)
     private val paddingSmall = Modifier.padding(8.dp)
 
-    override val name: String
-        get() = "Jobs"
 
     @Composable
-    override fun icon() {
-        Icon(Icons.Filled.Inbox, contentDescription = name)
-    }
-
-    @Composable
-    override fun content() {
+    fun JobsScreen() {
         Column(
             modifier = Modifier.fillMaxSize().verticalScroll(rememberScrollState()),
             verticalArrangement = Arrangement.Center,
@@ -160,4 +150,4 @@ object JobsScreen : Screen {
             }
         }
     }
-}
+

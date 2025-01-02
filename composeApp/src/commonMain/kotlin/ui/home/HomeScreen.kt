@@ -11,7 +11,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.rounded.Close
 import androidx.compose.material.icons.rounded.Refresh
 import androidx.compose.material.icons.rounded.Search
@@ -37,12 +36,11 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import org.koin.compose.koinInject
 import ui.model.ModelState
-import ui.model.Screen
 import ui.utils.ComboBox
 import viewmodels.VideoListViewModel
 
 
-object HomeScreen : Screen {
+object HomeScreen {
 
     private var filteredAudioCodec by mutableStateOf<String?>(null)
     private var filteredVideoCodec by mutableStateOf<String?>(null)
@@ -52,16 +50,8 @@ object HomeScreen : Screen {
     private val bottomPad = Modifier.padding(0.dp, 0.dp, 0.dp, 8.dp)
     private val sidePad = Modifier.padding(8.dp, 0.dp, 0.dp, 0.dp)
 
-    override val name: String
-        get() = "Home"
-
     @Composable
-    override fun icon() {
-        Icon(Icons.Filled.Home, contentDescription = name)
-    }
-
-    @Composable
-    override fun content() {
+    fun content() {
 
         var loadingJob: Job? by remember { mutableStateOf(null) }
         var loading by remember { mutableStateOf(true) }
@@ -100,9 +90,7 @@ object HomeScreen : Screen {
             // Heading & status
             Row(modifier = bottomPad) {
                 Text(
-                    "Video files",
-                    style = MaterialTheme.typography.headlineLarge,
-                    modifier = sidePad
+                    "Video files", style = MaterialTheme.typography.headlineLarge, modifier = sidePad
                 )
                 if (loading) {
                     CircularProgressIndicator(modifier = sidePad)
@@ -141,15 +129,18 @@ object HomeScreen : Screen {
     @OptIn(ExperimentalFoundationApi::class)
     @Composable
     fun PageContent(list: List<VideoFile>, videoSelected: (VideoFile) -> Unit, onRefresh: () -> Unit) {
-        val filteredVideos =
-            list.filter {
-                it.fileName.contains(filteredName, ignoreCase = true)
-                    && it.videos.any { v -> filteredVideoCodec?.let { fv -> v.codec == fv } ?: true }
-                    && it.audios.any { a -> filteredAudioCodec?.let { fa -> a.codec == fa } ?: true }
-            }
+        val filteredVideos = list.filter {
+            it.fileName.contains(
+                filteredName,
+                ignoreCase = true
+            ) && it.videos.any { v ->
+                filteredVideoCodec?.let { fv -> v.codec == fv } ?: true
+            } && it.audios.any { a -> filteredAudioCodec?.let { fa -> a.codec == fa } ?: true }
+        }
         Column {
             Row(modifier = bottomPad.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-                OutlinedTextField(value = filteredName,
+                OutlinedTextField(
+                    value = filteredName,
                     modifier = sidePad,
                     onValueChange = { filteredName = it },
                     label = { Text("File name") },

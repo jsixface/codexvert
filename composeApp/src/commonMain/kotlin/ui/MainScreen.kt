@@ -1,16 +1,20 @@
 package ui
 
 import Backend
-import androidx.compose.foundation.layout.*
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Cloud
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material3.Icon
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteScaffold
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
 import ui.home.HomeScreen
-import ui.model.Screen
+import ui.model.AppPages
 
 
 @Composable
@@ -18,28 +22,33 @@ fun MainScreen() {
 
     Surface(modifier = Modifier.fillMaxSize()) {
         var showCloudDialog by remember { mutableStateOf(false) }
-        var currentScreen: Screen by remember { mutableStateOf(HomeScreen) }
+        var currentPage by rememberSaveable { mutableStateOf(AppPages.HOME) }
 
-        Row(modifier = Modifier.fillMaxSize()) {
-            if (showCloudDialog) {
-                BackendDialog(Backend.host, { showCloudDialog = false }) { Backend.host = it }
-            }
+        if (showCloudDialog) {
+            BackendDialog(Backend.host, { showCloudDialog = false }) { Backend.host = it }
+        }
 
-            NavigationRail(modifier = Modifier.fillMaxHeight()) {
-                listOf(HomeScreen, JobsScreen,BackupsScreen, SettingsScreen).forEach { screen ->
-                    NavigationRailItem(icon = { screen.icon() },
-                        label = { Text(screen.name) },
-                        selected = currentScreen == screen,
-                        onClick = { currentScreen = screen })
-                }
-                Spacer(modifier = Modifier.weight(1f))
-                FloatingActionButton(onClick = { showCloudDialog = true }, modifier = Modifier.padding(8.dp)) {
-                    Icon(Icons.Filled.Cloud, contentDescription = "Backend")
+        NavigationSuiteScaffold(
+            navigationSuiteItems = {
+                AppPages.entries.forEach { page ->
+                    item(
+                        icon = { Icon(page.icon, contentDescription = page.title) },
+                        onClick = { currentPage = page },
+                        label = { Text(page.title) },
+                        selected = currentPage == page
+                    )
                 }
             }
-            Box(modifier = Modifier.fillMaxSize().weight(1f), contentAlignment = Alignment.Center) {
-                currentScreen.content()
+        ) {
+            when (currentPage) {
+                AppPages.HOME -> HomeScreen.content()
+                AppPages.JOBS -> JobsScreen()
+                AppPages.BACKUPS -> BackupsScreen()
+                AppPages.SETTINGS -> SettingsScreen()
             }
         }
+//        FloatingActionButton(onClick = { showCloudDialog = true }, modifier = Modifier.padding(8.dp)) {
+//            Icon(Icons.Filled.Cloud, contentDescription = "Backend")
+//        }
     }
 }
