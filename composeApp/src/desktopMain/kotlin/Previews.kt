@@ -11,7 +11,7 @@ import ui.BackupContent
 import ui.JobContent
 import ui.ListEditor
 import ui.home.FileDetails
-import ui.home.HomeScreen
+import ui.home.PageContent
 import ui.theme.AppTheme
 import kotlin.random.Random
 
@@ -102,6 +102,6 @@ private fun seeFileDetails() {
 @Composable
 private fun seeVideoScreen() {
     AppTheme {
-        HomeScreen.PageContent(videos, {}) {}
+        PageContent(videos, {}) {}
     }
 }

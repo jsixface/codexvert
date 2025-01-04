@@ -41,7 +41,7 @@ fun MainScreen() {
             }
         ) {
             when (currentPage) {
-                AppPages.HOME -> HomeScreen.content()
+                AppPages.HOME -> HomeScreen()
                 AppPages.JOBS -> JobsScreen()
                 AppPages.BACKUPS -> BackupsScreen()
                 AppPages.SETTINGS -> SettingsScreen()

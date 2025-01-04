@@ -36,6 +36,7 @@ kotlin {
             implementation(compose.materialIconsExtended)
             implementation(compose.ui)
             implementation(compose.components.resources)
+            implementation(libs.bundles.material3.adaptive)
             implementation(projects.shared)
             implementation(libs.kotlinx.coroutines.core)
             implementation(libs.kotlinx.datetime)
