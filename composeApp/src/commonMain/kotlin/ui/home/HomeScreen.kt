@@ -1,8 +1,8 @@
 package ui.home
 
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.hoverable
 import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -14,13 +14,20 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Close
 import androidx.compose.material.icons.rounded.Refresh
 import androidx.compose.material.icons.rounded.Search
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.adaptive.ExperimentalMaterial3AdaptiveApi
+import androidx.compose.material3.adaptive.layout.AnimatedPane
+import androidx.compose.material3.adaptive.layout.ListDetailPaneScaffold
+import androidx.compose.material3.adaptive.layout.ListDetailPaneScaffoldRole
+import androidx.compose.material3.adaptive.navigation.rememberListDetailPaneScaffoldNavigator
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -40,15 +47,14 @@ import ui.utils.ComboBox
 import viewmodels.VideoListViewModel
 
 
-private val bottomPad = Modifier.padding(0.dp, 0.dp, 0.dp, 8.dp)
 private val sidePad = Modifier.padding(8.dp, 0.dp, 0.dp, 0.dp)
 
 
+@OptIn(ExperimentalMaterial3AdaptiveApi::class)
 @Composable
 fun HomeScreen() {
 
-    var selectedVideo by mutableStateOf<VideoFile?>(null)
-    var showFileDetails by mutableStateOf(false)
+    val navigator = rememberListDetailPaneScaffoldNavigator<VideoFile>()
 
     var loadingJob: Job? by remember { mutableStateOf(null) }
     var loading by remember { mutableStateOf(true) }
@@ -83,52 +89,49 @@ fun HomeScreen() {
     }
     LaunchedEffect(Unit) { load() }
 
-    Column(modifier = Modifier.padding(16.dp).fillMaxWidth()) {
-        // Heading & status
-        Row(modifier = bottomPad) {
-            Text(
-                "Video files", style = MaterialTheme.typography.headlineLarge, modifier = sidePad
-            )
-            if (loading) {
-                CircularProgressIndicator(modifier = sidePad)
+    ListDetailPaneScaffold(
+        directive = navigator.scaffoldDirective,
+        value = navigator.scaffoldValue,
+        listPane = {
+            AnimatedPane {
+                if (loading) CircularProgressIndicator(modifier = sidePad)
+                if (errorLoading) {
+                    Text(
+                        "Error loading list",
+                        style = MaterialTheme.typography.titleMedium,
+                        color = MaterialTheme.colorScheme.error
+                    )
+                }
+                PageContent(videoList, videoSelected = {
+                    navigator.navigateTo(ListDetailPaneScaffoldRole.Detail, it)
+                }) {
+                    scope.launch {
+                        loading = true
+                        viewModel.refresh()
+                        load()
+                    }
+                }
             }
-            if (errorLoading) {
-                Text(
-                    "Error loading list",
-                    style = MaterialTheme.typography.titleMedium,
-                    color = MaterialTheme.colorScheme.error
-                )
-            }
-        }
-
-        if (showFileDetails) {
-            selectedVideo?.let { v ->
-                FileDetailsDialog(v) { conv ->
-                    showFileDetails = false
-                    conv?.let { scope.launch { viewModel.submitJob(v, conv) } }
+        },
+        detailPane = {
+            AnimatedPane {
+                navigator.currentDestination?.content?.let { v ->
+                    FileDetails(v) { conv ->
+                        conv?.let { scope.launch { viewModel.submitJob(v, conv) } }
+                        navigator.navigateBack()
+                    }
                 }
             }
         }
-        PageContent(videoList, videoSelected = {
-            selectedVideo = it
-            showFileDetails = true
-        }) {
-            scope.launch {
-                loading = true
-                viewModel.refresh()
-                load()
-            }
-        }
-    }
+    )
 }
 
 
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun PageContent(list: List<VideoFile>, videoSelected: (VideoFile) -> Unit, onRefresh: () -> Unit) {
-    var filteredAudioCodec by mutableStateOf<String?>(null)
-    var filteredVideoCodec by mutableStateOf<String?>(null)
-    var filteredName by mutableStateOf("")
+    var filteredAudioCodec by remember { mutableStateOf<String?>(null) }
+    var filteredVideoCodec by remember { mutableStateOf<String?>(null) }
+    var filteredName by remember { mutableStateOf("") }
 
     val filteredVideos = list.filter {
         it.fileName.contains(
@@ -139,52 +142,37 @@ fun PageContent(list: List<VideoFile>, videoSelected: (VideoFile) -> Unit, onRef
         } && it.audios.any { a -> filteredAudioCodec?.let { fa -> a.codec == fa } ?: true }
     }
     Column {
-        Row(modifier = bottomPad.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+        val filterMod = Modifier.padding(8.dp, 0.dp).fillMaxWidth()
+        Column(modifier = filterMod, horizontalAlignment = Alignment.CenterHorizontally) {
+            val videoOptions = list.asSequence().flatMap { it.videos }.map { it.codec }.toSet().toList().sorted()
+            val audioOptions = list.asSequence().flatMap { it.audios }.map { it.codec }.toSet().toList().sorted()
+
             OutlinedTextField(
                 value = filteredName,
-                modifier = sidePad,
+                modifier = filterMod,
                 onValueChange = { filteredName = it },
                 label = { Text("File name") },
                 leadingIcon = { Icon(Icons.Rounded.Search, contentDescription = "Search") })
-            val videoOptions = list.asSequence().flatMap { it.videos }.map { it.codec }.toSet().toList().sorted()
-            ComboBox("Video Codecs", videoOptions, filteredVideoCodec) { filteredVideoCodec = it }
-            val audioOptions = list.asSequence().flatMap { it.audios }.map { it.codec }.toSet().toList().sorted()
-            ComboBox("Audio Codecs", audioOptions, filteredAudioCodec) { filteredAudioCodec = it }
-            IconButton(modifier = sidePad, onClick = onRefresh) {
-                Icon(Icons.Rounded.Refresh, contentDescription = "Refresh")
-            }
-            // Clear filters
-            if (filteredName.isNotEmpty() || filteredAudioCodec != null || filteredVideoCodec != null) {
-                IconButton(onClick = {
-                    filteredName = ""
-                    filteredAudioCodec = null
-                    filteredVideoCodec = null
-                }) {
-                    Icon(Icons.Rounded.Close, contentDescription = "Clear filters")
+            ComboBox("Video Codecs", videoOptions, filteredVideoCodec, modifier = filterMod) { filteredVideoCodec = it }
+            ComboBox("Audio Codecs", audioOptions, filteredAudioCodec, modifier = filterMod) { filteredAudioCodec = it }
+            Row(horizontalArrangement = Arrangement.SpaceEvenly) {
+                IconButton(modifier = sidePad, onClick = onRefresh) {
+                    Icon(Icons.Rounded.Refresh, contentDescription = "Refresh")
+                }
+                // Clear filters
+                if (filteredName.isNotEmpty() || filteredAudioCodec != null || filteredVideoCodec != null) {
+                    IconButton(onClick = {
+                        filteredName = ""
+                        filteredAudioCodec = null
+                        filteredVideoCodec = null
+                    }) {
+                        Icon(Icons.Rounded.Close, contentDescription = "Clear filters")
+                    }
                 }
             }
         }
-        Row(modifier = bottomPad.fillMaxSize()) {
+        Row(modifier = Modifier.fillMaxSize().padding(8.dp)) {
             LazyColumn {
-                stickyHeader {
-                    Row(modifier = Modifier.padding(8.dp)) {
-                        Text(
-                            "File name",
-                            style = MaterialTheme.typography.titleMedium,
-                            modifier = Modifier.weight(4f)
-                        )
-                        Text(
-                            "Video Codecs",
-                            style = MaterialTheme.typography.titleMedium,
-                            modifier = Modifier.weight(1f)
-                        )
-                        Text(
-                            "Audio Codecs",
-                            style = MaterialTheme.typography.titleMedium,
-                            modifier = Modifier.weight(1f)
-                        )
-                    }
-                }
                 items(filteredVideos) { file ->
                     VideoRow(file) { videoSelected(it) }
                 }
@@ -195,16 +183,21 @@ fun PageContent(list: List<VideoFile>, videoSelected: (VideoFile) -> Unit, onRef
 
 @Composable
 private fun VideoRow(file: VideoFile, onClick: (VideoFile) -> Unit) {
-    Column {
-        Surface(
-            onClick = { onClick(file) },
-            tonalElevation = 3.dp,
-            modifier = Modifier.hoverable(MutableInteractionSource())
-        ) {
-            Row(modifier = Modifier.padding(8.dp)) {
-                Text(file.fileName, style = MaterialTheme.typography.bodyMedium, modifier = Modifier.weight(4f))
-                Text(file.videoInfo, style = MaterialTheme.typography.bodyMedium, modifier = Modifier.weight(1f))
-                Text(file.audioInfo, style = MaterialTheme.typography.bodyMedium, modifier = Modifier.weight(1f))
+    Card(
+        onClick = { onClick(file) },
+        modifier = Modifier.fillMaxWidth().padding(4.dp).hoverable(MutableInteractionSource()),
+        elevation = CardDefaults.cardElevation(3.dp)
+    ) {
+        Column(modifier = Modifier.fillMaxWidth()) {
+            Text(
+                text = file.fileName,
+                style = MaterialTheme.typography.bodyLarge,
+                modifier = Modifier.fillMaxWidth().padding(8.dp)
+            )
+            HorizontalDivider(color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.12f))
+            Row(modifier = Modifier.fillMaxWidth().padding(8.dp), horizontalArrangement = Arrangement.SpaceEvenly) {
+                Text(text = file.videoInfo, style = MaterialTheme.typography.bodyMedium)
+                Text(text = file.audioInfo, style = MaterialTheme.typography.bodyMedium)
             }
         }
     }

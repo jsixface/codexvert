@@ -1,9 +1,9 @@
 package ui
 
 import Backend
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Icon
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteScaffold
 import androidx.compose.runtime.Composable
@@ -20,7 +20,7 @@ import ui.model.AppPages
 @Composable
 fun MainScreen() {
 
-    Surface(modifier = Modifier.fillMaxSize()) {
+    Box(modifier = Modifier.fillMaxSize()) {
         var showCloudDialog by remember { mutableStateOf(false) }
         var currentPage by rememberSaveable { mutableStateOf(AppPages.HOME) }
 
