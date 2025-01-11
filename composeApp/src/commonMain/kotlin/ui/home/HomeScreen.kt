@@ -24,6 +24,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.adaptive.ExperimentalMaterial3AdaptiveApi
+import androidx.compose.material3.adaptive.currentWindowAdaptiveInfo
 import androidx.compose.material3.adaptive.layout.AnimatedPane
 import androidx.compose.material3.adaptive.layout.ListDetailPaneScaffold
 import androidx.compose.material3.adaptive.layout.ListDetailPaneScaffoldRole
@@ -36,8 +37,13 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalWindowInfo
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.toSize
+import getClientConfig
 import io.github.jsixface.common.VideoFile
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
@@ -147,6 +153,16 @@ fun PageContent(list: List<VideoFile>, videoSelected: (VideoFile) -> Unit, onRef
             val videoOptions = list.asSequence().flatMap { it.videos }.map { it.codec }.toSet().toList().sorted()
             val audioOptions = list.asSequence().flatMap { it.audios }.map { it.codec }.toSet().toList().sorted()
 
+            @OptIn(ExperimentalComposeUiApi::class)
+            if (getClientConfig().isDebugEnabled()) {
+                val windowInfo = currentWindowAdaptiveInfo()
+                val width = windowInfo.windowSizeClass.windowWidthSizeClass.toString().split(" ")[1]
+                val height = windowInfo.windowSizeClass.windowHeightSizeClass.toString().split(" ")[1]
+                Text("Window Width = $width")
+                Text("Window Height = $height")
+                Text("Window size = ${LocalWindowInfo.current.containerSize.toSize()}")
+                Text("density = ${LocalDensity.current.density}")
+            }
             OutlinedTextField(
                 value = filteredName,
                 modifier = filterMod,

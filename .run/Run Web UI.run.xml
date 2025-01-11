@@ -1,9 +1,9 @@
 <component name="ProjectRunConfigurationManager">
-    <configuration default="false" name="Run Desktop" type="GradleRunConfiguration" factoryName="Gradle">
+    <configuration default="false" name="Run Web UI" type="GradleRunConfiguration" factoryName="Gradle">
         <ExternalSystemSettings>
             <option name="env">
                 <map>
-                    <entry key="DEBUG_MODE" value="1"/>
+                    <entry key="BIND" value="0.0.0.0"/>
                 </map>
             </option>
             <option name="executionName"/>
@@ -15,7 +15,7 @@
             </option>
             <option name="taskNames">
                 <list>
-                    <option value="composeApp:run"/>
+                    <option value="runWebUI"/>
                 </list>
             </option>
             <option name="vmOptions"/>

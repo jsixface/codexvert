@@ -23,7 +23,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 
 @Composable
-fun BackendDialog(initialUrl: String, onDismiss: () -> Unit, onSave: (String) -> Unit) {
+fun ClientDialog(initialUrl: String, onDismiss: () -> Unit, onSave: (String) -> Unit) {
     Dialog(onDismissRequest = onDismiss) {
         BackendDialogContent(initialUrl, onSave, onDismiss)
     }

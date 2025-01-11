@@ -1,3 +1,7 @@
-actual object Backend {
-    actual var host: String = "http://localhost:8080"
+private val desktopClientConfig = object : ClientConfig {
+    override fun isDebugEnabled() = System.getenv().containsKey("DEBUG_MODE")
+
+    override var backendHost: String = "http://localhost:8080"
 }
+
+actual fun getClientConfig() = desktopClientConfig

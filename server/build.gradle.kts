@@ -51,7 +51,11 @@ val copyProdToStatic by tasks.registering {
     }
 }
 
-tasks.named("run") { dependsOn(copyDevToStatic) }
+tasks.register("runWebUI") { dependsOn(copyDevToStatic, "run") }
 tasks.named("runFatJar") { dependsOn(copyDevToStatic) }
 tasks.named("startScripts") { dependsOn(copyProdToStatic) }
 tasks.named("shadowJar") { dependsOn(copyProdToStatic) }
+
+tasks.named("clean") {
+    doLast { delete(staticDir) }
+}

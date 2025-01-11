@@ -12,7 +12,9 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.rounded.Analytics
 import androidx.compose.material.icons.sharp.Delete
+import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ElevatedButton
@@ -36,6 +38,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import getClientConfig
 import io.github.jsixface.common.Settings
 import kotlinx.coroutines.launch
 import org.koin.compose.koinInject
@@ -67,6 +70,13 @@ fun SettingsScreen() {
             val extensions = remember { mutableStateListOf<String>() }
             val locations = remember { mutableStateListOf<String>() }
             var refreshDuration by remember { mutableStateOf<Duration?>(null) }
+
+
+            var showCloudDialog by remember { mutableStateOf(false) }
+            if (showCloudDialog && getClientConfig().isDebugEnabled()) {
+                val clientConfig = getClientConfig()
+                ClientDialog(clientConfig.backendHost, { showCloudDialog = false }) { clientConfig.backendHost = it }
+            }
 
             LaunchedEffect(Unit) {
                 scope.launch {
@@ -101,7 +111,7 @@ fun SettingsScreen() {
             }
 
             Column(modifier = padding) {
-                Row {
+                Row(horizontalArrangement = Arrangement.SpaceAround, modifier = Modifier.fillMaxWidth()) {
                     Text(
                         text = "Settings",
                         fontSize = 30.sp,
@@ -110,6 +120,9 @@ fun SettingsScreen() {
                     )
                     if (loading) {
                         CircularProgressIndicator(modifier = padding.width(30.dp))
+                    }
+                    Button(onClick = { showCloudDialog = true }, modifier = Modifier.padding(8.dp)) {
+                        Icon(Icons.Rounded.Analytics, contentDescription = "Backend")
                     }
                 }
                 Column {

@@ -1,6 +1,5 @@
 package ui
 
-import Backend
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Icon
@@ -9,7 +8,6 @@ import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteScaffo
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
@@ -21,12 +19,8 @@ import ui.model.AppPages
 fun MainScreen() {
 
     Box(modifier = Modifier.fillMaxSize()) {
-        var showCloudDialog by remember { mutableStateOf(false) }
         var currentPage by rememberSaveable { mutableStateOf(AppPages.HOME) }
 
-        if (showCloudDialog) {
-            BackendDialog(Backend.host, { showCloudDialog = false }) { Backend.host = it }
-        }
 
         NavigationSuiteScaffold(
             navigationSuiteItems = {
@@ -47,8 +41,5 @@ fun MainScreen() {
                 AppPages.SETTINGS -> SettingsScreen()
             }
         }
-//        FloatingActionButton(onClick = { showCloudDialog = true }, modifier = Modifier.padding(8.dp)) {
-//            Icon(Icons.Filled.Cloud, contentDescription = "Backend")
-//        }
     }
 }
