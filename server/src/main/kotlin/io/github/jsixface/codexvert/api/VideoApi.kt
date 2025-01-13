@@ -4,7 +4,6 @@ import io.github.jsixface.codexvert.logger
 import io.github.jsixface.codexvert.utils.CodecUtils.parseMediaInfo
 import io.github.jsixface.common.TrackType
 import io.github.jsixface.common.VideoFile
-import kotlin.io.path.ExperimentalPathApi
 import kotlin.io.path.Path
 import kotlin.io.path.PathWalkOption
 import kotlin.io.path.extension
@@ -17,7 +16,6 @@ import kotlin.io.path.walk
 typealias VideoList = Map<String, VideoFile>
 
 
-@OptIn(ExperimentalPathApi::class)
 class VideoApi {
 
     private val logger = logger()

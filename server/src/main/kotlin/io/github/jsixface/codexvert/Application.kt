@@ -1,5 +1,6 @@
 package io.github.jsixface.codexvert
 
+import io.github.jsixface.codexvert.db.migrateDatabases
 import io.github.jsixface.codexvert.plugins.configureHTTP
 import io.github.jsixface.codexvert.plugins.configureKoin
 import io.github.jsixface.codexvert.plugins.configureRouting
@@ -12,6 +13,7 @@ fun main(args: Array<String>): Unit = EngineMain.main(args)
 
 fun Application.module() {
     configureKoin()
+    migrateDatabases()
     configureRouting()
     configureHTTP()
 }

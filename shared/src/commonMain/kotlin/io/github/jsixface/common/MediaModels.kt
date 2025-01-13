@@ -30,8 +30,8 @@ sealed class Conversion {
     data class Convert(val codec: Codec) : Conversion()
 }
 
-enum class TrackType(val stream: String) {
-    Video("v"), Audio("a"), Subtitle("a")
+enum class TrackType {
+    Video, Audio, Subtitle
 }
 
 @Serializable

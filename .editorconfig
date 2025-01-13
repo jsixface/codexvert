@@ -15,7 +15,7 @@ ij_continuation_indent_size = 4
 # ij_wrap_on_typing = false
 ij_java_use_single_class_imports = true
 
-[*.yml]
+[{*.yml,*.yaml}]
 indent_size = 2
 
 [{*.kt,*.kts}]

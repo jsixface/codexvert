@@ -1,5 +1,6 @@
 [versions]
 compose-plugin = "1.7.3"
+exposed-version = "0.56.0"
 koin = "4.1.0-Beta1"
 kotlin = "2.1.0"
 kotlinx-coroutines = "1.10.1"
@@ -7,12 +8,18 @@ kotlinx-datetime = "0.6.1"
 kotlinx-serialization = "1.7.3"
 ksp = "2.1.0-1.0.29"
 ktor = "3.0.3"
+liquibase = "4.30.0"
 logback = "1.5.15"
 logstash-logback-encoder = "8.0"
 material3-adaptive = "1.0.1"
 napier = "2.7.1"
+sqlite = "3.47.1.0"
 
 [libraries]
+exposed-core = { module = "org.jetbrains.exposed:exposed-core", version.ref = "exposed-version" }
+exposed-dao = { module = "org.jetbrains.exposed:exposed-dao", version.ref = "exposed-version" }
+exposed-jdbc = { module = "org.jetbrains.exposed:exposed-jdbc", version.ref = "exposed-version" }
+exposed-json = { module = "org.jetbrains.exposed:exposed-json", version.ref = "exposed-version" }
 koin-compose = { module = "io.insert-koin:koin-compose", version.ref = "koin" }
 koin-core = { module = "io.insert-koin:koin-core", version.ref = "koin" }
 koin-ktor = { module = "io.insert-koin:koin-ktor3", version.ref = "koin" }
@@ -45,8 +52,18 @@ material3-adaptive = { module = "org.jetbrains.compose.material3.adaptive:adapti
 material3-adaptive-layout = { module = "org.jetbrains.compose.material3.adaptive:adaptive-layout", version.ref = "material3-adaptive" }
 material3-adaptive-navigation = { module = "org.jetbrains.compose.material3.adaptive:adaptive-navigation", version.ref = "material3-adaptive" }
 napier = { module = "io.github.aakira:napier", version.ref = "napier" }
+liquibase-core = { module = "org.liquibase:liquibase-core", version.ref = "liquibase" }
+sqlite = { module = "org.xerial:sqlite-jdbc", version.ref = "sqlite" }
 
 [bundles]
+database = [
+    "exposed-core",
+    "exposed-dao",
+    "exposed-jdbc",
+    "exposed-json",
+    "liquibase-core",
+    "sqlite"
+]
 koin-server = [
     "koin-core",
     "koin-ktor",

@@ -1,0 +1,150 @@
+databaseChangeLog:
+  - changeSet:
+      id: create-basic-tables
+      author: Arumugam J
+      changes:
+        - createTable:
+            tableName: VideoFiles
+            columns:
+              - column:
+                  name: id
+                  type: int
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+              - column:
+                  name: name
+                  type: varchar(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: path
+                  type: varchar(500)
+                  constraints:
+                    nullable: false
+                    unique: true
+              - column:
+                  name: size_mb
+                  type: int
+                  constraints:
+                    nullable: false
+              - column:
+                  name: modified
+                  type: bigint
+              - column:
+                  name: added
+                  type: bigint
+        - createTable:
+            tableName: Subtitles
+            columns:
+              - column:
+                  name: id
+                  type: int
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+              - column:
+                  name: index
+                  type: int
+              - column:
+                  name: codec
+                  type: varchar(50)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: language
+                  type: varchar(50)
+              - column:
+                  name: video_file_id
+                  type: int
+                  constraints:
+                    nullable: false
+                    references: VideoFiles(id)
+                    foreignKeyName: fk_videofile_subtitle
+        - createTable:
+            tableName: Audios
+            columns:
+              - column:
+                  name: id
+                  type: int
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+              - column:
+                  name: index
+                  type: int
+              - column:
+                  name: codec
+                  type: varchar(50)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: channels
+                  type: varchar(50)
+              - column:
+                  name: layout
+                  type: varchar(50)
+              - column:
+                  name: bit_rate
+                  type: int
+              - column:
+                  name: sample_rate
+                  type: int
+              - column:
+                  name: language
+                  type: varchar(50)
+              - column:
+                  name: video_file_id
+                  type: int
+                  constraints:
+                    nullable: false
+                    references: VideoFiles(id)
+                    foreignKeyName: fk_videofile_audio
+        - createTable:
+            tableName: Videos
+            columns:
+              - column:
+                  name: id
+                  type: int
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+              - column:
+                  name: index
+                  type: int
+              - column:
+                  name: codec
+                  type: varchar(10)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: codec_tag
+                  type: varchar(25)
+              - column:
+                  name: profile
+                  type: varchar(50)
+              - column:
+                  name: resolution
+                  type: varchar(50)
+              - column:
+                  name: aspect_ratio
+                  type: varchar(20)
+              - column:
+                  name: frame_rate
+                  type: float
+              - column:
+                  name: bit_rate
+                  type: int
+              - column:
+                  name: bit_depth
+                  type: int
+              - column:
+                  name: pixel_format
+                  type: varchar(50)
+              - column:
+                  name: video_file_id
+                  type: int
+                  constraints:
+                    nullable: false
+                    references: VideoFiles(id)
+                    foreignKeyName: fk_videofile_video

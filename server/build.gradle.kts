@@ -16,6 +16,7 @@ dependencies {
     implementation(libs.logback)
     implementation(libs.logstash.logback.encoder)
     implementation(libs.bundles.ktor.server)
+    implementation(libs.bundles.database)
     implementation(libs.kotlinx.datetime)
     implementation(libs.kotlinx.json)
     implementation(libs.bundles.koin.server)
