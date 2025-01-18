@@ -34,16 +34,16 @@ class VideoEntity(id: EntityID<Int>) : IntEntity(id) {
     var bitRate by VideosTable.bitRate
     var bitDepth by VideosTable.bitDepth
     var pixelFormat by VideosTable.pixelFormat
-    val videoFile by VideoFileEntity referrersOn VideosTable.videoFile
+    var videoFile by VideoFileEntity referencedOn VideosTable.videoFile
 }
 
 object AudiosTable : IntIdTable() {
     val index = integer("index")
     val codec = varchar("codec", 50)
-    val channels = varchar("channels", 50)
+    val channels = integer("channels")
     val layout = varchar("layout", 50)
     val bitrate = integer("bit_rate")
-    val sampleRate = integer("sample_rate")
+    val sampleRate = varchar("sample_rate", 25)
     val language = varchar("language", 50)
     val videoFile = reference("video_file_id", VideoFilesTable, onDelete = ReferenceOption.CASCADE)
 }
@@ -58,7 +58,7 @@ class AudioEntity(id: EntityID<Int>) : IntEntity(id) {
     var bitrate by AudiosTable.bitrate
     var sampleRate by AudiosTable.sampleRate
     var language by AudiosTable.language
-    val videoFile by VideoFileEntity referrersOn AudiosTable.videoFile
+    var videoFile by VideoFileEntity referencedOn AudiosTable.videoFile
 }
 
 object SubtitlesTable : IntIdTable() {
@@ -74,7 +74,7 @@ class SubtitleEntity(id: EntityID<Int>) : IntEntity(id) {
     var index by SubtitlesTable.index
     var codec by SubtitlesTable.codec
     var language by SubtitlesTable.language
-    val videoFile by VideoFileEntity referrersOn SubtitlesTable.videoFile
+    var videoFile by VideoFileEntity referencedOn SubtitlesTable.videoFile
 }
 
 object VideoFilesTable : IntIdTable() {
@@ -90,7 +90,10 @@ class VideoFileEntity(id: EntityID<Int>) : IntEntity(id) {
 
     var path by VideoFilesTable.path
     var name by VideoFilesTable.name
-    val sizeMb by VideoFilesTable.sizeMb
+    var sizeMb by VideoFilesTable.sizeMb
+    val videoStream by VideoEntity backReferencedOn VideosTable.videoFile
+    val audioStreams by AudioEntity referrersOn AudiosTable.videoFile
+    val subtitles by SubtitleEntity referrersOn SubtitlesTable.videoFile
     var modified by VideoFilesTable.modified
     var added by VideoFilesTable.added
 }

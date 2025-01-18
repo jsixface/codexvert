@@ -34,6 +34,14 @@ databaseChangeLog:
               - column:
                   name: added
                   type: bigint
+
+        - createIndex:
+            tableName: VideoFiles
+            indexName: idx_video_path
+            columns:
+              - column:
+                  name: path
+
         - createTable:
             tableName: Subtitles
             columns:
@@ -89,7 +97,7 @@ databaseChangeLog:
                   type: int
               - column:
                   name: sample_rate
-                  type: int
+                  type: varchar(25)
               - column:
                   name: language
                   type: varchar(50)

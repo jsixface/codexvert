@@ -62,7 +62,6 @@ database = [
     "exposed-jdbc",
     "exposed-json",
     "liquibase-core",
-    "sqlite"
 ]
 koin-server = [
     "koin-core",
