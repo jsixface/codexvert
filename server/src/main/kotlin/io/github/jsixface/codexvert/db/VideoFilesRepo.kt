@@ -84,7 +84,7 @@ class VideoFilesRepo(private val db: Database) : IVideoFilesRepo {
         dbQuery {
             val v = get(id)
             logger.debug("deleting video file: ${v?.path}")
-            v?.videoStream?.delete()
+            v?.videoStream?.forEach { it.delete() }
             v?.audioStreams?.forEach { it.delete() }
             v?.subtitles?.forEach { it.delete() }
             v?.delete()
@@ -93,7 +93,7 @@ class VideoFilesRepo(private val db: Database) : IVideoFilesRepo {
 
     override suspend fun update(videoInfo: ProbeInfo, entity: VideoFileEntity) = dbQuery {
         try {
-            entity.videoStream.delete()
+            entity.videoStream.forEach { it.delete() }
             entity.audioStreams.forEach { it.delete() }
             entity.subtitles.forEach { it.delete() }
             videoInfo.streams.forEach { createStream(it, entity) }

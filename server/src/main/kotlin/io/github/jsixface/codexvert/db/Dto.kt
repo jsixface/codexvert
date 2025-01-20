@@ -91,7 +91,7 @@ class VideoFileEntity(id: EntityID<Int>) : IntEntity(id) {
     var path by VideoFilesTable.path
     var name by VideoFilesTable.name
     var sizeMb by VideoFilesTable.sizeMb
-    val videoStream by VideoEntity backReferencedOn VideosTable.videoFile
+    val videoStream by VideoEntity referrersOn VideosTable.videoFile
     val audioStreams by AudioEntity referrersOn AudiosTable.videoFile
     val subtitles by SubtitleEntity referrersOn SubtitlesTable.videoFile
     var modified by VideoFilesTable.modified

@@ -43,7 +43,7 @@ fun AudioEntity.updateInfo(stream: ProbeStream) {
 fun Float.shortString() = if (this == toInt().toFloat()) this.toInt().toString() else "%.2f".format(this)
 
 fun VideoFileEntity.toVideoFile(): VideoFile = transaction {
-    val videoTrack = videoStream.toMediaTrack()
+    val videoTracks = videoStream.map { it.toMediaTrack() }
     val audioTracks = audioStreams.map { it.toMediaTrack() }
     val subtitleTracks = subtitles.map { it.toMediaTrack() }
     VideoFile(
@@ -51,7 +51,7 @@ fun VideoFileEntity.toVideoFile(): VideoFile = transaction {
         fileName = name,
         modifiedTime = modified,
         audios = audioTracks,
-        videos = listOf(videoTrack),
+        videos = videoTracks,
         subtitles = subtitleTracks,
     )
 }
