@@ -12,10 +12,9 @@ class AspectRatio(private val w: Float, private val h: Float) {
     }
 
     companion object {
-        operator fun invoke(ratio: String): AspectRatio {
+        fun from(ratio: String): AspectRatio? {
             val measures = ratio.split(":").mapNotNull { it.toFloatOrNull() }
-            assert(measures.size == 2) { "Should be in the format 'w:h" }
-            return AspectRatio(measures[0], measures[1])
+            return if (measures.size == 2) AspectRatio(measures[0], measures[1]) else null
         }
     }
 }

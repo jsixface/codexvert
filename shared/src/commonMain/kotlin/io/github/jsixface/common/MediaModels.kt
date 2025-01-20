@@ -1,8 +1,5 @@
 package io.github.jsixface.common
 
-import kotlinx.datetime.Instant
-import kotlinx.datetime.TimeZone
-import kotlinx.datetime.toLocalDateTime
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
@@ -58,24 +55,7 @@ data class VideoFile(
     val audios: List<MediaTrack> = listOf(),
     val videos: List<MediaTrack> = listOf(),
     val subtitles: List<MediaTrack> = listOf()
-) {
-    val videoInfo: String
-        get() = videos.joinToString { it.codec }
-
-    val audioInfo: String
-        get() = audios.joinToString { it.codec }
-
-    val subtitleInfo: String
-        get() = subtitles.joinToString { it.codec }
-
-    val modified: String
-        get() {
-            val dateTime = Instant.fromEpochMilliseconds(modifiedTime)
-                .toLocalDateTime(TimeZone.currentSystemDefault())
-            return "${dateTime.date} ${dateTime.time}"
-        }
-
-}
+)
 
 @Serializable
 data class MediaStream(

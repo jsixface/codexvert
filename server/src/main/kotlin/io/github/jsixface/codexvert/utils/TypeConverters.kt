@@ -17,7 +17,7 @@ fun VideoEntity.updateInfo(stream: ProbeStream) {
     profile = stream.profile
     pixelFormat = stream.pixelFormat
     resolution = "${stream.width}x${stream.height}"
-    aspectRatio = AspectRatio(stream.aspectRatio).toString()
+    aspectRatio = AspectRatio.from(stream.aspectRatio)?.toString() ?: ""
     frameRate = stream.frameRate.let {
         if (it.contains('/').not()) it.toFloatOrNull() else {
             val (f, s) = it.split("/").mapNotNull { x -> x.toFloatOrNull() }

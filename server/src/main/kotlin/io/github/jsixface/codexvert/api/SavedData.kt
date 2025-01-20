@@ -1,17 +1,13 @@
 package io.github.jsixface.codexvert.api
 
 import io.github.jsixface.common.Settings
-import io.github.jsixface.common.VideoFile
-import java.io.File
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
+import java.io.File
 
 @Serializable
-data class SavedData(
-        val settings: Settings,
-        val details: MutableMap<String, VideoFile>
-) {
+data class SavedData(val settings: Settings) {
 
     fun save() {
         val dataStr = json.encodeToString(this)
@@ -29,7 +25,7 @@ data class SavedData(
             return if (dataStr.isNotBlank())
                 json.decodeFromString(dataStr)
             else
-                SavedData(Settings(), mutableMapOf())
+                SavedData(Settings())
         }
     }
 }
