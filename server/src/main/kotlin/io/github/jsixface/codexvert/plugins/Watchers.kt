@@ -3,7 +3,9 @@ package io.github.jsixface.codexvert.plugins
 import io.github.jsixface.codexvert.api.ConversionApi
 import io.github.jsixface.codexvert.api.SavedData
 import io.github.jsixface.codexvert.api.VideoApi
+import io.github.jsixface.codexvert.db.IVideoFilesRepo
 import io.github.jsixface.codexvert.logger
+import io.github.jsixface.codexvert.utils.toVideoFile
 import io.github.jsixface.common.Codec
 import io.github.jsixface.common.Conversion
 import io.github.jsixface.common.isDolby
@@ -16,7 +18,11 @@ import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlin.time.Duration
 
-class Watchers(private val videoApi: VideoApi, private val conversionApi: ConversionApi) {
+class Watchers(
+    private val videoApi: VideoApi,
+    private val repo: IVideoFilesRepo,
+    private val conversionApi: ConversionApi
+) {
     private val logger = logger()
     private var watchingJob: Job? = null
     private val scope = CoroutineScope(Dispatchers.IO + SupervisorJob())
@@ -48,11 +54,11 @@ class Watchers(private val videoApi: VideoApi, private val conversionApi: Conver
         }
     }
 
-    private fun processChanges() {
+    private suspend fun processChanges() {
         // Convert the files that has EAC3 or AC3 codec to AAC codec.
         // Make sure those files are not already in the job queue.
-        val files = videoApi.getVideos()
-        files.values.forEach { videoFile ->
+        val files = repo.getAll().map { it.toVideoFile() }
+        files.forEach { videoFile ->
             val dolbyTracks = videoFile.audios.filter { it.isDolby() }
             val job = conversionApi.jobs.find { it.videoFile.fileName == videoFile.fileName }
             if (dolbyTracks.isNotEmpty() && job == null) {

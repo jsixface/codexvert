@@ -84,6 +84,9 @@ class VideoFilesRepo(private val db: Database) : IVideoFilesRepo {
         dbQuery {
             val v = get(id)
             logger.debug("deleting video file: ${v?.path}")
+            v?.videoStream?.delete()
+            v?.audioStreams?.forEach { it.delete() }
+            v?.subtitles?.forEach { it.delete() }
             v?.delete()
         }
     }

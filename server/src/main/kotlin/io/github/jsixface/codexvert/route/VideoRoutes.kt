@@ -25,18 +25,18 @@ fun Route.videoRoutes() {
     val conversionApi by inject<ConversionApi>()
 
     get<Api.Videos> {
-        call.respond(videoApi.getVideos().values.toList().sortedBy { it.fileName })
+        call.respond(videoApi.getVideos().sortedBy { it.fileName })
     }
 
     patch<Api.Videos> {
         videoApi.refreshDirs()
-        call.respond(videoApi.getVideos().values.toList().sortedBy { it.fileName })
+        call.respond(videoApi.getVideos().sortedBy { it.fileName })
     }
 
     get<Api.Videos.Video> { video ->
         logger.info("Getting video ${video.path}")
         video.path?.let {
-            val find = videoApi.getVideos().values.find { v -> v.fileName == it }
+            val find = videoApi.getVideo(it)
             logger.info("found = $find")
             call.respondNullable(find)
         } ?: run {
@@ -45,13 +45,13 @@ fun Route.videoRoutes() {
     }
 
     post<Api.Videos.Video> { video ->
-        val fileName = video.path ?: run {
+        val videoFilePath = video.path ?: run {
             logger.warn("no path in URL")
             call.respond(HttpStatusCode.BadRequest)
             return@post
         }
-        val videoFile = videoApi.getVideos().values.find { it.fileName == fileName } ?: run {
-            logger.warn("No videos found by name $fileName")
+        val videoFile = videoApi.getVideo(videoFilePath) ?: run {
+            logger.warn("No videos found by name $videoFilePath")
             call.respond(HttpStatusCode.BadRequest)
             return@post
         }

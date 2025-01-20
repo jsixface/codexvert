@@ -13,7 +13,7 @@ import kotlin.io.path.walk
 
 interface IParser {
     suspend fun parseVideoFile(file: Path)
-    suspend fun parseAll(locations: List<String>, extensions: List<String>)
+    suspend fun parseAll(locations: List<String>, extensions: List<String>): Boolean
 }
 
 class Parser(private val repo: IVideoFilesRepo) : IParser {
@@ -29,7 +29,7 @@ class Parser(private val repo: IVideoFilesRepo) : IParser {
         }
     }
 
-    override suspend fun parseAll(locations: List<String>, extensions: List<String>) {
+    override suspend fun parseAll(locations: List<String>, extensions: List<String>): Boolean {
         val videos = locations.map { Path(it) }.flatMap { loc ->
             loc.walk(PathWalkOption.FOLLOW_LINKS)
                 .filter { it.isDirectory().not() }
@@ -38,13 +38,12 @@ class Parser(private val repo: IVideoFilesRepo) : IParser {
             .mapKeys { it.key.toAbsolutePath().toString() }
         val entries = repo.getAll().associateBy { it.path }
 
-        val added = videos - entries.keys
         val deleted = entries - videos.keys
-        val modified = videos.filter { it.value != entries[it.key]?.modified } - added.keys
-        logger.info("Total files: ${videos.size}, Added: ${added.size}, Deleted: ${deleted.size}, Modified: ${modified.size}")
-        added.keys.forEach { parseVideoFile(Path(it)) }
+        val modified = videos.filter { it.value != entries[it.key]?.modified }
+        logger.info("Total files: ${videos.size}, Deleted: ${deleted.size}, Added/Modified: ${modified.size}")
         modified.keys.forEach { parseVideoFile(Path(it)) }
         deleted.values.forEach { repo.delete(it.id.value) }
+        return deleted.isNotEmpty() || modified.isNotEmpty()
     }
 
 }

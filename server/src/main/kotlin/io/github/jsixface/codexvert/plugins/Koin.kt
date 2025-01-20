@@ -13,20 +13,23 @@ import io.github.jsixface.codexvert.ffprobe.Parser
 import io.ktor.server.application.Application
 import org.jetbrains.exposed.sql.Database
 import org.koin.core.context.startKoin
+import org.koin.core.module.dsl.createdAtStart
+import org.koin.core.module.dsl.singleOf
+import org.koin.dsl.bind
 import org.koin.dsl.module
 import org.koin.logger.slf4jLogger
 
 fun Application.configureKoin() {
     val koinModule = module {
         single<Database> { getDb() }
-        single<IVideoFilesRepo> { VideoFilesRepo(get()) }
-        single<IParser> { Parser(get()) }
-        single { VideoApi() }
-        single { BackupApi() }
-        single { ConversionApi() }
-        single { JobsApi(conversionApi = get()) }
-        single(createdAtStart = true) { Watchers(videoApi = get(), conversionApi = get()) }
-        single { SettingsApi(watchers = get()) }
+        singleOf(::VideoFilesRepo) bind IVideoFilesRepo::class
+        singleOf(::Parser) bind IParser::class
+        singleOf(::VideoApi)
+        singleOf(::BackupApi)
+        singleOf(::ConversionApi)
+        singleOf(::JobsApi)
+        singleOf(::SettingsApi)
+        singleOf(::Watchers) { createdAtStart() }
     }
 
     startKoin {

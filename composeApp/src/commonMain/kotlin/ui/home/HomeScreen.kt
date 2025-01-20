@@ -100,21 +100,23 @@ fun HomeScreen() {
         value = navigator.scaffoldValue,
         listPane = {
             AnimatedPane {
-                if (loading) CircularProgressIndicator(modifier = sidePad)
-                if (errorLoading) {
-                    Text(
-                        "Error loading list",
-                        style = MaterialTheme.typography.titleMedium,
-                        color = MaterialTheme.colorScheme.error
-                    )
-                }
-                PageContent(videoList, videoSelected = {
-                    navigator.navigateTo(ListDetailPaneScaffoldRole.Detail, it)
-                }) {
-                    scope.launch {
-                        loading = true
-                        viewModel.refresh()
-                        load()
+                Column {
+                    if (loading) CircularProgressIndicator(modifier = sidePad)
+                    if (errorLoading) {
+                        Text(
+                            "Error loading list",
+                            style = MaterialTheme.typography.titleMedium,
+                            color = MaterialTheme.colorScheme.error
+                        )
+                    }
+                    PageContent(videoList, videoSelected = {
+                        navigator.navigateTo(ListDetailPaneScaffoldRole.Detail, it)
+                    }) {
+                        scope.launch {
+                            loading = true
+                            viewModel.refresh()
+                            load()
+                        }
                     }
                 }
             }

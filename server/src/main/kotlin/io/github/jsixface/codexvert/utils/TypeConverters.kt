@@ -1,8 +1,14 @@
 package io.github.jsixface.codexvert.utils
 
 import io.github.jsixface.codexvert.db.AudioEntity
+import io.github.jsixface.codexvert.db.SubtitleEntity
 import io.github.jsixface.codexvert.db.VideoEntity
+import io.github.jsixface.codexvert.db.VideoFileEntity
 import io.github.jsixface.codexvert.ffprobe.ProbeStream
+import io.github.jsixface.common.MediaTrack
+import io.github.jsixface.common.TrackType
+import io.github.jsixface.common.VideoFile
+import org.jetbrains.exposed.sql.transactions.transaction
 
 fun VideoEntity.updateInfo(stream: ProbeStream) {
     index = stream.index
@@ -36,3 +42,22 @@ fun AudioEntity.updateInfo(stream: ProbeStream) {
 
 fun Float.shortString() = if (this == toInt().toFloat()) this.toInt().toString() else "%.2f".format(this)
 
+fun VideoFileEntity.toVideoFile(): VideoFile = transaction {
+    val videoTrack = videoStream.toMediaTrack()
+    val audioTracks = audioStreams.map { it.toMediaTrack() }
+    val subtitleTracks = subtitles.map { it.toMediaTrack() }
+    VideoFile(
+        path = path,
+        fileName = name,
+        modifiedTime = modified,
+        audios = audioTracks,
+        videos = listOf(videoTrack),
+        subtitles = subtitleTracks,
+    )
+}
+
+private fun VideoEntity.toMediaTrack() = MediaTrack(TrackType.Video, index, codec)
+
+private fun AudioEntity.toMediaTrack() = MediaTrack(TrackType.Audio, index, codec)
+
+private fun SubtitleEntity.toMediaTrack() = MediaTrack(TrackType.Subtitle, index, codec)

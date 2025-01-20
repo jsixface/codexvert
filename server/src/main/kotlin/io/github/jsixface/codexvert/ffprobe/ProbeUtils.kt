@@ -21,15 +21,16 @@ object ProbeUtils {
                 "-show_entries", "stream:program:format:chapter",
                 path.toAbsolutePath().toString(),
             )
+        var output = ""
         return try {
             val process = builder.start()
-            val output = process.inputStream.use { it.bufferedReader().readText() }
+            output = process.inputStream.use { it.bufferedReader().readText() }
             process.waitFor()
             val probeInfo = json.decodeFromString<ProbeInfo>(output)
             logger.debug("Probe info: $probeInfo")
             probeInfo
         } catch (e: Exception) {
-            logger.error("Cant get file information for $path", e)
+            logger.error("Cant get file information for $path. Output = $output", e)
             null
         }
     }
