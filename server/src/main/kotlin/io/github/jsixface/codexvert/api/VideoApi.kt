@@ -15,7 +15,7 @@ class VideoApi(private val parser: IParser, private val repo: IVideoFilesRepo) {
     private val logger = logger()
     private var cache = emptyList<VideoFile>()
 
-    private suspend fun updateCache() {
+    suspend fun updateCache() {
         logger.info("${this::class.simpleName} updateCache()")
         cache = repo.getAll().map { it.toVideoFile() }
     }

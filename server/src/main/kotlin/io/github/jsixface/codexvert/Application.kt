@@ -16,6 +16,7 @@ fun Application.module() {
     migrateDatabases()
     configureRouting()
     configureHTTP()
+    initialize()
 }
 
 
