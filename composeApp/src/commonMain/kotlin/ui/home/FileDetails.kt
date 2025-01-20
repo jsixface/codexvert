@@ -1,37 +1,62 @@
 package ui.home
 
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.*
+import androidx.compose.material3.Button
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.FilterChip
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedCard
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateMapOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.window.Dialog
-import androidx.compose.ui.window.DialogProperties
-import io.github.jsixface.common.*
+import io.github.jsixface.common.Codec
+import io.github.jsixface.common.Conversion
 import io.github.jsixface.common.Conversion.Convert
+import io.github.jsixface.common.MediaTrack
+import io.github.jsixface.common.VideoFile
+import org.koin.compose.koinInject
+import ui.model.ModelState
+import viewmodels.VideoListViewModel
 
 @Composable
-fun FileDetailsDialog(file: VideoFile, onDismiss: (Map<MediaTrack, Conversion>?) -> Unit) {
-    Dialog(
-        onDismissRequest = { onDismiss(null) },
-        properties = DialogProperties(usePlatformDefaultWidth = false)
-    ) {
-        FileDetails(file) { onDismiss(it) }
-    }
-}
+fun FileDetails(file: String, onDismiss: (Map<MediaTrack, Conversion>?) -> Unit) {
+    val viewModel = koinInject<VideoListViewModel>()
+    var videoFile by remember { mutableStateOf<VideoFile?>(null) }
+    var errorLoading by remember { mutableStateOf<String?>(null) }
+    val conversion = remember { mutableStateMapOf<MediaTrack, Conversion>() }
+    LaunchedEffect(file) {
+        viewModel.getVideoFile(file).collect {
+            when (it) {
+                is ModelState.Success -> {
+                    videoFile = it.result
+                    it.result.audios.forEach { a -> conversion[a] = Conversion.Copy }
+                    it.result.videos.forEach { v -> conversion[v] = Conversion.Copy }
+                }
 
-@Composable
-fun FileDetails(file: VideoFile, onDismiss: (Map<MediaTrack, Conversion>?) -> Unit) {
-    val conversion = remember {
-        mutableStateMapOf<MediaTrack, Conversion>().apply {
-            file.audios.forEach { put(it, Conversion.Copy) }
-            file.videos.forEach { put(it, Conversion.Copy) }
+                is ModelState.Error<*> -> {
+                    errorLoading = it.msg
+                }
+
+                is ModelState.Init<*> -> {
+                    videoFile = null
+                }
+            }
         }
     }
 
@@ -45,33 +70,37 @@ fun FileDetails(file: VideoFile, onDismiss: (Map<MediaTrack, Conversion>?) -> Un
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
-            Row {
-                Text(file.fileName, style = MaterialTheme.typography.displaySmall, modifier = padder)
-            }
-
-            if (file.audios.isNotEmpty()) Text("Audio Tracks", style = MaterialTheme.typography.bodyLarge)
-            LazyColumn {
-                itemsIndexed(file.audios) { i, track ->
-                    CodecRow(i, track, conversion[track] ?: Conversion.Copy) { conversion[track] = it }
+            videoFile?.let { file ->
+                Row {
+                    Text(file.fileName, style = MaterialTheme.typography.displaySmall, modifier = padder)
                 }
-            }
 
-            if (file.videos.isNotEmpty()) Text("Video Tracks", style = MaterialTheme.typography.bodyLarge)
-            LazyColumn {
-                itemsIndexed(file.videos) { i, track ->
-                    CodecRow(i, track, conversion[track] ?: Conversion.Copy) { conversion[track] = it }
+                if (file.audios.isNotEmpty()) Text("Audio Tracks", style = MaterialTheme.typography.bodyLarge)
+                LazyColumn {
+                    itemsIndexed(file.audios) { i, track ->
+                        CodecRow(i, track, conversion[track] ?: Conversion.Copy) { conversion[track] = it }
+                    }
                 }
-            }
 
-            Row {
-                Button(onClick = { onDismiss(conversion.toMap()) }, modifier = padder) { Text("Convert") }
-                Button(onClick = { onDismiss(null) }, modifier = padder) { Text("Cancel") }
+                if (file.videos.isNotEmpty()) Text("Video Tracks", style = MaterialTheme.typography.bodyLarge)
+                LazyColumn {
+                    itemsIndexed(file.videos) { i, track ->
+                        CodecRow(i, track, conversion[track] ?: Conversion.Copy) { conversion[track] = it }
+                    }
+                }
+
+                Row {
+                    Button(onClick = { onDismiss(conversion.toMap()) }, modifier = padder) { Text("Convert") }
+                    Button(onClick = { onDismiss(null) }, modifier = padder) { Text("Cancel") }
+                }
+            } ?: Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                Text("Loading...", style = MaterialTheme.typography.displayLarge, modifier = padder)
+                CircularProgressIndicator(modifier = padder)
             }
         }
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun CodecRow(ai: Int, track: MediaTrack, selected: Conversion, onSelect: (Conversion) -> Unit) {
     val codecsAvailable = Codec.entries.filter { it.type == track.type }

@@ -17,7 +17,6 @@ import androidx.compose.material.icons.rounded.Search
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -44,7 +43,7 @@ import androidx.compose.ui.platform.LocalWindowInfo
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.toSize
 import getClientConfig
-import io.github.jsixface.common.VideoFile
+import io.github.jsixface.common.CodecsCollection
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import org.koin.compose.koinInject
@@ -58,21 +57,21 @@ private val sidePad = Modifier.padding(8.dp, 0.dp, 0.dp, 0.dp)
 
 @OptIn(ExperimentalMaterial3AdaptiveApi::class)
 @Composable
-fun HomeScreen() {
+fun HomeScreen(codecsCollection: CodecsCollection?) {
 
-    val navigator = rememberListDetailPaneScaffoldNavigator<VideoFile>()
+    val navigator = rememberListDetailPaneScaffoldNavigator<String>()
 
     var loadingJob: Job? by remember { mutableStateOf(null) }
     var loading by remember { mutableStateOf(true) }
     var errorLoading by remember { mutableStateOf(false) }
-    var videoList by remember { mutableStateOf(listOf<VideoFile>()) }
+    var videoList by remember { mutableStateOf(mapOf<String, String>()) }
     val viewModel = koinInject<VideoListViewModel>()
     val scope = rememberCoroutineScope()
 
-    fun load() {
+    fun load(audioFilter: String? = null, videoFilter: String? = null) {
         loadingJob?.cancel()
         loadingJob = scope.launch {
-            viewModel.videoList.collect {
+            viewModel.videoList(audioFilter, videoFilter).collect {
                 when (it) {
                     is ModelState.Init -> {
                         loading = true
@@ -109,9 +108,11 @@ fun HomeScreen() {
                             color = MaterialTheme.colorScheme.error
                         )
                     }
-                    PageContent(videoList, videoSelected = {
-                        navigator.navigateTo(ListDetailPaneScaffoldRole.Detail, it)
-                    }) {
+                    PageContent(
+                        videoList,
+                        codecsCollection,
+                        updateFilter = { audioCodec, videoCodec -> load(audioCodec, videoCodec) },
+                        videoSelected = { navigator.navigateTo(ListDetailPaneScaffoldRole.Detail, it) }) {
                         scope.launch {
                             loading = true
                             viewModel.refresh()
@@ -136,24 +137,23 @@ fun HomeScreen() {
 
 
 @Composable
-fun PageContent(list: List<VideoFile>, videoSelected: (VideoFile) -> Unit, onRefresh: () -> Unit) {
+fun PageContent(
+    list: Map<String, String>,
+    codecs: CodecsCollection?,
+    updateFilter: (String?, String?) -> Unit,
+    videoSelected: (String) -> Unit,
+    onRefresh: () -> Unit
+) {
     var filteredAudioCodec by remember { mutableStateOf<String?>(null) }
     var filteredVideoCodec by remember { mutableStateOf<String?>(null) }
     var filteredName by remember { mutableStateOf("") }
 
-    val filteredVideos = list.filter {
-        it.fileName.contains(
-            filteredName,
-            ignoreCase = true
-        ) && it.videos.any { v ->
-            filteredVideoCodec?.let { fv -> v.codec == fv } ?: true
-        } && it.audios.any { a -> filteredAudioCodec?.let { fa -> a.codec == fa } ?: true }
-    }
+    val filteredVideos = list.filter { it.value.contains(filteredName, ignoreCase = true) }.map { it.key to it.value }
     Column {
         val filterMod = Modifier.padding(8.dp, 0.dp).fillMaxWidth()
         Column(modifier = filterMod, horizontalAlignment = Alignment.CenterHorizontally) {
-            val videoOptions = list.asSequence().flatMap { it.videos }.map { it.codec }.toSet().toList().sorted()
-            val audioOptions = list.asSequence().flatMap { it.audios }.map { it.codec }.toSet().toList().sorted()
+            val videoOptions = codecs?.video ?: emptyList()
+            val audioOptions = codecs?.audio ?: emptyList()
 
             @OptIn(ExperimentalComposeUiApi::class)
             if (getClientConfig().isDebugEnabled()) {
@@ -171,8 +171,14 @@ fun PageContent(list: List<VideoFile>, videoSelected: (VideoFile) -> Unit, onRef
                 onValueChange = { filteredName = it },
                 label = { Text("File name") },
                 leadingIcon = { Icon(Icons.Rounded.Search, contentDescription = "Search") })
-            ComboBox("Video Codecs", videoOptions, filteredVideoCodec, modifier = filterMod) { filteredVideoCodec = it }
-            ComboBox("Audio Codecs", audioOptions, filteredAudioCodec, modifier = filterMod) { filteredAudioCodec = it }
+            ComboBox("Video Codecs", videoOptions, filteredVideoCodec, modifier = filterMod) {
+                filteredVideoCodec = it
+                updateFilter(filteredAudioCodec, filteredVideoCodec)
+            }
+            ComboBox("Audio Codecs", audioOptions, filteredAudioCodec, modifier = filterMod) {
+                filteredAudioCodec = it
+                updateFilter(filteredAudioCodec, filteredVideoCodec)
+            }
             Row(horizontalArrangement = Arrangement.SpaceEvenly) {
                 IconButton(modifier = sidePad, onClick = onRefresh) {
                     Icon(Icons.Rounded.Refresh, contentDescription = "Refresh")
@@ -183,6 +189,7 @@ fun PageContent(list: List<VideoFile>, videoSelected: (VideoFile) -> Unit, onRef
                         filteredName = ""
                         filteredAudioCodec = null
                         filteredVideoCodec = null
+                        updateFilter(filteredAudioCodec, filteredVideoCodec)
                     }) {
                         Icon(Icons.Rounded.Close, contentDescription = "Clear filters")
                     }
@@ -192,7 +199,7 @@ fun PageContent(list: List<VideoFile>, videoSelected: (VideoFile) -> Unit, onRef
         Row(modifier = Modifier.fillMaxSize().padding(8.dp)) {
             LazyColumn {
                 items(filteredVideos) { file ->
-                    VideoRow(file) { videoSelected(it) }
+                    VideoRow(file.second) { videoSelected(file.first) }
                 }
             }
         }
@@ -200,7 +207,7 @@ fun PageContent(list: List<VideoFile>, videoSelected: (VideoFile) -> Unit, onRef
 }
 
 @Composable
-private fun VideoRow(file: VideoFile, onClick: (VideoFile) -> Unit) {
+private fun VideoRow(file: String, onClick: (String) -> Unit) {
     Card(
         onClick = { onClick(file) },
         modifier = Modifier.fillMaxWidth().padding(4.dp).hoverable(MutableInteractionSource()),
@@ -208,15 +215,10 @@ private fun VideoRow(file: VideoFile, onClick: (VideoFile) -> Unit) {
     ) {
         Column(modifier = Modifier.fillMaxWidth()) {
             Text(
-                text = file.fileName,
+                text = file,
                 style = MaterialTheme.typography.bodyLarge,
                 modifier = Modifier.fillMaxWidth().padding(8.dp)
             )
-            HorizontalDivider(color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.12f))
-            Row(modifier = Modifier.fillMaxWidth().padding(8.dp), horizontalArrangement = Arrangement.SpaceEvenly) {
-                Text(text = file.videoInfo, style = MaterialTheme.typography.bodyMedium)
-                Text(text = file.audioInfo, style = MaterialTheme.typography.bodyMedium)
-            }
         }
     }
 }

@@ -25,9 +25,11 @@ class VideoListViewModel(private val client: HttpClient) {
         log("New VideoListViewModel")
     }
 
-    val videoList = flow<ModelState<List<VideoFile>>> {
+    fun videoList(audioFilter: String? = null, videoFilter: String? = null) = flow<ModelState<Map<String, String>>> {
         emit(Init())
-        runCatching { client.get(Api.Videos) }.onSuccess { resp ->
+        runCatching {
+            client.get(Api.Videos(videoFilter = videoFilter, audioFilter = audioFilter))
+        }.onSuccess { resp ->
             when {
                 resp.status.isSuccess() -> emit(Success(resp.body()))
                 else -> emit(Error("Error. Status: ${resp.status}"))
@@ -37,14 +39,28 @@ class VideoListViewModel(private val client: HttpClient) {
         }
     }
 
-    suspend fun submitJob(videoFile: VideoFile, conversions: Map<MediaTrack, Conversion>) {
-        client.post(Api.Videos.Video(path = videoFile.fileName)) {
+    fun getVideoFile(path: String) = flow<ModelState<VideoFile>> {
+        emit(Init())
+        runCatching {
+            client.get(Api.Videos.Video(path = path))
+        }.onSuccess { resp ->
+            when {
+                resp.status.isSuccess() -> emit(Success(resp.body()))
+                else -> emit(Error("Error. Status: ${resp.status}"))
+            }
+        }.onFailure {
+            emit(Error("Error. Status: ${it.message}"))
+        }
+    }
+
+    suspend fun submitJob(videoFile: String, conversions: Map<MediaTrack, Conversion>) {
+        client.post(Api.Videos.Video(path = videoFile)) {
             setBody(conversions)
             contentType(ContentType.Application.Cbor)
         }
     }
 
     suspend fun refresh() {
-        client.patch(Api.Videos).status
+        client.patch(Api.Videos()).status
     }
 }

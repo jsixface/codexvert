@@ -5,13 +5,16 @@ import io.ktor.resources.Resource
 sealed interface Api {
 
     @Resource("/videos")
-    data object Videos : Api {
+    data class Videos(val videoFilter: String? = null, val audioFilter: String? = null) : Api {
         @Resource("video")
-        data class Video(val parent: Videos = Videos, val path: String?) : Api
+        data class Video(val parent: Videos = Videos(), val path: String?) : Api
     }
 
+    @Resource("/codecs")
+    data object Codecs : Api
+
     @Resource("/backups")
-    data object Backups: Api {
+    data object Backups : Api {
         @Resource("/backup")
         data class Backup(val parent: Backups = Backups, val path: String) : Api
     }

@@ -12,7 +12,9 @@ import io.ktor.client.plugins.resources.Resources
 import io.ktor.serialization.kotlinx.cbor.cbor
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.cbor.Cbor
+import org.koin.core.module.dsl.factoryOf
 import org.koin.dsl.module
+import viewmodels.AppViewModel
 import viewmodels.BackupScreenViewModel
 import viewmodels.JobsScreenModel
 import viewmodels.SettingsScreenModel
@@ -22,10 +24,11 @@ object Koin {
     val services = module {
         single { createHttpClient(enableNetworkLogs = true) }
 
-        factory { SettingsScreenModel(client = get()) }
-        factory { JobsScreenModel(client = get()) }
-        factory { BackupScreenViewModel(client = get()) }
-        factory { VideoListViewModel(client = get()) }
+        factoryOf(::AppViewModel)
+        factoryOf(::BackupScreenViewModel)
+        factoryOf(::JobsScreenModel)
+        factoryOf(::SettingsScreenModel)
+        factoryOf(::VideoListViewModel)
     }
 
     @OptIn(ExperimentalSerializationApi::class)

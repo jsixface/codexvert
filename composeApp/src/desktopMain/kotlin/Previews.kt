@@ -10,8 +10,6 @@ import ui.BackendDialogContent
 import ui.BackupContent
 import ui.JobContent
 import ui.ListEditor
-import ui.home.FileDetails
-import ui.home.PageContent
 import ui.theme.AppTheme
 import kotlin.random.Random
 
@@ -87,21 +85,5 @@ fun seeBackups() {
 fun previewBackendDialog() {
     AppTheme {
         BackendDialogContent("helium.home", {}, {})
-    }
-}
-
-@Preview
-@Composable
-private fun seeFileDetails() {
-    AppTheme {
-        FileDetails(videos[0]) {}
-    }
-}
-
-@Preview
-@Composable
-private fun seeVideoScreen() {
-    AppTheme {
-        PageContent(videos, {}) {}
     }
 }

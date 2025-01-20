@@ -19,6 +19,13 @@ enum class Codec(
 }
 
 @Serializable
+data class CodecsCollection(
+    val video: List<String>,
+    val audio: List<String>,
+    val subtitle: List<String>,
+)
+
+@Serializable
 sealed class Conversion {
     @Serializable
     data object Copy : Conversion()

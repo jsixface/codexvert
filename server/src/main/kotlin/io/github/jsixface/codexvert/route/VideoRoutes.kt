@@ -24,13 +24,13 @@ fun Route.videoRoutes() {
     val videoApi by inject<VideoApi>()
     val conversionApi by inject<ConversionApi>()
 
-    get<Api.Videos> {
-        call.respond(videoApi.getVideos().sortedBy { it.fileName })
+    get<Api.Videos> { v ->
+        call.respond(videoApi.getVideos(v.audioFilter, v.videoFilter))
     }
 
     patch<Api.Videos> {
         videoApi.refreshDirs()
-        call.respond(videoApi.getVideos().sortedBy { it.fileName })
+        call.respond("OK")
     }
 
     get<Api.Videos.Video> { video ->
@@ -60,5 +60,9 @@ fun Route.videoRoutes() {
         logger.info("Got the data: $data")
         conversionApi.startConversion(videoFile, data)
         call.respond("OK")
+    }
+
+    get<Api.Codecs> {
+        call.respond(videoApi.getCodecsPresent())
     }
 }
