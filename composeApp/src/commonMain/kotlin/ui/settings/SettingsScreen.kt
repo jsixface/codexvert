@@ -1,4 +1,4 @@
-package ui
+package ui.settings
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -140,7 +140,6 @@ fun SettingsScreen() {
                         options = listOf(1.minutes, 5.minutes, 15.minutes, 30.minutes, 1.hours),
                         selected = refreshDuration
                     ) { refreshDuration = it }
-
                 }
                 Row(modifier = Modifier.fillMaxSize()) {
                     Spacer(modifier = Modifier.weight(1f))

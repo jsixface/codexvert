@@ -4,6 +4,7 @@ import io.github.jsixface.common.Api
 import io.github.jsixface.common.Conversion
 import io.github.jsixface.common.MediaTrack
 import io.github.jsixface.common.VideoFile
+import io.github.jsixface.common.VideoList
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.plugins.resources.get
@@ -25,7 +26,7 @@ class VideoListViewModel(private val client: HttpClient) {
         log("New VideoListViewModel")
     }
 
-    fun videoList(audioFilter: String? = null, videoFilter: String? = null) = flow<ModelState<Map<String, String>>> {
+    fun videoList(audioFilter: String? = null, videoFilter: String? = null) = flow<ModelState<VideoList>> {
         emit(Init())
         runCatching {
             client.get(Api.Videos(videoFilter = videoFilter, audioFilter = audioFilter))

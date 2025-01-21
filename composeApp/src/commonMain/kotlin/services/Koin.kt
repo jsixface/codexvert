@@ -14,7 +14,6 @@ import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.cbor.Cbor
 import org.koin.core.module.dsl.factoryOf
 import org.koin.dsl.module
-import viewmodels.AppViewModel
 import viewmodels.BackupScreenViewModel
 import viewmodels.JobsScreenModel
 import viewmodels.SettingsScreenModel
@@ -24,7 +23,6 @@ object Koin {
     val services = module {
         single { createHttpClient(enableNetworkLogs = true) }
 
-        factoryOf(::AppViewModel)
         factoryOf(::BackupScreenViewModel)
         factoryOf(::JobsScreenModel)
         factoryOf(::SettingsScreenModel)

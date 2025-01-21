@@ -6,9 +6,9 @@ import io.github.jsixface.codexvert.logger
 import io.github.jsixface.codexvert.utils.toVideoFile
 import io.github.jsixface.common.CodecsCollection
 import io.github.jsixface.common.VideoFile
+import io.github.jsixface.common.VideoList
 import java.nio.file.Path
 
-typealias VideoList = Map<String, String>
 
 class VideoApi(private val parser: IParser, private val repo: IVideoFilesRepo) {
 
@@ -29,22 +29,25 @@ class VideoApi(private val parser: IParser, private val repo: IVideoFilesRepo) {
     }
 
     fun getVideos(audioFilter: String?, videoFilter: String?): VideoList {
-        return cache.filter { audioFilter?.let { af -> it.audios.any { a -> a.codec == af } } ?: true }
+        val filtered = cache.filter { audioFilter?.let { af -> it.audios.any { a -> a.codec == af } } ?: true }
             .filter { videoFilter?.let { vf -> it.videos.any { v -> v.codec == vf } } ?: true }
-            .associate { it.path to it.fileName }
+        val codecs = getCodecsPresent(filtered)
+        return VideoList(pathAndNames = filtered.associate { it.path to it.fileName }, codecs)
     }
 
     suspend fun getVideo(path: String): VideoFile? {
         return repo.getFile(Path.of(path))?.toVideoFile()
     }
 
+    private fun getCodecsPresent(videoFiles: List<VideoFile>): CodecsCollection {
+        val codecV = videoFiles.flatMap { it.videos }.map { it.codec }.distinct().sorted()
+        val codecA = videoFiles.flatMap { it.audios }.map { it.codec }.distinct().sorted()
+        val codecS = videoFiles.flatMap { it.subtitles }.map { it.codec }.distinct().sorted()
+        return CodecsCollection(video = codecV, audio = codecA, subtitle = codecS)
+    }
+
     suspend fun getCodecsPresent(): CodecsCollection {
         if (cache.isEmpty()) updateCache()
-
-        val allVids = cache
-        val codecV = allVids.flatMap { it.videos }.map { it.codec }.distinct().sorted()
-        val codecA = allVids.flatMap { it.audios }.map { it.codec }.distinct().sorted()
-        val codecS = allVids.flatMap { it.subtitles }.map { it.codec }.distinct().sorted()
-        return CodecsCollection(video = codecV, audio = codecA, subtitle = codecS)
+        return getCodecsPresent(cache)
     }
 }

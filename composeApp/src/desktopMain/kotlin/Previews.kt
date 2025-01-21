@@ -6,10 +6,10 @@ import io.github.jsixface.common.JobStatus
 import io.github.jsixface.common.MediaTrack
 import io.github.jsixface.common.TrackType
 import io.github.jsixface.common.VideoFile
-import ui.BackendDialogContent
 import ui.BackupContent
 import ui.JobContent
-import ui.ListEditor
+import ui.settings.BackendDialogContent
+import ui.settings.ListEditor
 import ui.theme.AppTheme
 import kotlin.random.Random
 
@@ -85,5 +85,13 @@ fun seeBackups() {
 fun previewBackendDialog() {
     AppTheme {
         BackendDialogContent("helium.home", {}, {})
+    }
+}
+
+@Preview
+@Composable
+fun previewListEditor() {
+    AppTheme {
+        ListEditor("List title", listOf("One", "Two", "Three"), {}, {})
     }
 }
