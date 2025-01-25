@@ -1,6 +1,7 @@
 
 import androidx.compose.desktop.ui.tooling.preview.Preview
 import androidx.compose.runtime.Composable
+import io.github.jsixface.common.AutoConversion
 import io.github.jsixface.common.ConversionJob
 import io.github.jsixface.common.JobStatus
 import io.github.jsixface.common.MediaTrack
@@ -8,6 +9,7 @@ import io.github.jsixface.common.TrackType
 import io.github.jsixface.common.VideoFile
 import ui.BackupContent
 import ui.JobContent
+import ui.settings.AutoConvertSettings
 import ui.settings.BackendDialogContent
 import ui.settings.ListEditor
 import ui.theme.AppTheme
@@ -93,5 +95,13 @@ fun previewBackendDialog() {
 fun previewListEditor() {
     AppTheme {
         ListEditor("List title", listOf("One", "Two", "Three"), {}, {})
+    }
+}
+
+@Composable
+@Preview
+fun previewAutoConversion() {
+    AppTheme {
+        AutoConvertSettings(setting = AutoConversion())
     }
 }

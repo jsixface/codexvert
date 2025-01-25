@@ -14,9 +14,9 @@ import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.cbor.Cbor
 import org.koin.core.module.dsl.factoryOf
 import org.koin.dsl.module
+import ui.settings.SettingsScreenModel
 import viewmodels.BackupScreenViewModel
 import viewmodels.JobsScreenModel
-import viewmodels.SettingsScreenModel
 import viewmodels.VideoListViewModel
 
 object Koin {

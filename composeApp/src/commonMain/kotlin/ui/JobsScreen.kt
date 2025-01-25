@@ -46,108 +46,108 @@ import viewmodels.JobsScreenModel
 
 
 private val padding = Modifier.padding(16.dp)
-    private val paddingSmall = Modifier.padding(8.dp)
+private val paddingSmall = Modifier.padding(8.dp)
 
 
-    @Composable
-    fun JobsScreen() {
-        Column(
-            modifier = Modifier.fillMaxSize().verticalScroll(rememberScrollState()),
-            verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally,
+@Composable
+fun JobsScreen() {
+    Column(
+        modifier = Modifier.fillMaxSize().verticalScroll(rememberScrollState()),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally,
+    ) {
+        val jobsScreenModel = koinInject<JobsScreenModel>()
+        val scope = rememberCoroutineScope()
+        var jobs by remember { mutableStateOf(listOf<ConversionJob>()) }
+        LaunchedEffect(Unit) {
+            scope.launch {
+                jobsScreenModel.jobs.collect { jobResult ->
+                    when (jobResult) {
+                        is ModelState.Error, is ModelState.Init -> {}
+                        is ModelState.Success -> jobs = jobResult.result
+                    }
+                }
+            }
+        }
+        JobContent(
+            jobs,
+            onClear = { scope.launch { jobsScreenModel.clearJobs() } },
+            onDelete = { scope.launch { jobsScreenModel.delete(it) } })
+    }
+}
+
+@Composable
+fun JobContent(jobs: List<ConversionJob>, onDelete: (String) -> Unit, onClear: () -> Unit) {
+    Card(
+        modifier = Modifier.width(width = 900.dp).fillMaxHeight().padding(20.dp)
+    ) {
+        Column(modifier = padding) {
+            Row {
+                Text(
+                    text = "Jobs",
+                    fontSize = 30.sp,
+                    modifier = padding,
+                    textAlign = TextAlign.Center,
+                )
+            }
+            Column {
+                jobs.forEach { job -> JobItem(job) { onDelete(job.jobId) } }
+            }
+            Row(modifier = Modifier.fillMaxSize()) {
+                Spacer(modifier = Modifier.weight(1f))
+                ElevatedButton(onClick = onClear, modifier = padding) {
+                    Text("Clear Completed")
+                }
+                Spacer(modifier = Modifier.weight(1f))
+            }
+        }
+    }
+}
+
+@Composable
+fun JobItem(job: ConversionJob, onDelete: () -> Unit) {
+    Column {
+        val progressPadding = Modifier.padding(8.dp).fillMaxWidth()
+        OutlinedCard(
+            modifier = Modifier.padding(16.dp, 4.dp).fillMaxWidth()
         ) {
-            val jobsScreenModel = koinInject<JobsScreenModel>()
-            val scope = rememberCoroutineScope()
-            var jobs by remember { mutableStateOf(listOf<ConversionJob>()) }
-            LaunchedEffect(Unit) {
-                scope.launch {
-                    jobsScreenModel.jobs.collect { jobResult ->
-                        when (jobResult) {
-                            is ModelState.Error, is ModelState.Init -> {}
-                            is ModelState.Success -> jobs = jobResult.result
-                        }
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Column(modifier = Modifier.weight(1f).padding(8.dp)) {
+                    Text(job.file.fileName, modifier = paddingSmall)
+                    when (job.status) {
+                        Starting -> LinearProgressIndicator(modifier = progressPadding)
+                        InProgress -> LinearProgressIndicator(
+                            progress = { job.progress / 100.0f },
+                            modifier = progressPadding,
+                        )
+
+                        Completed -> Text(
+                            "Completed",
+                            style = MaterialTheme.typography.labelSmall,
+                            modifier = paddingSmall
+                        )
+
+                        Failed -> Text(
+                            "Failed",
+                            style = MaterialTheme.typography.labelSmall,
+                            color = MaterialTheme.colorScheme.error,
+                            modifier = paddingSmall
+                        )
+
+                        Queued -> Text(
+                            "Queued",
+                            style = MaterialTheme.typography.labelSmall,
+                            modifier = paddingSmall
+                        )
                     }
                 }
-            }
-            JobContent(
-                jobs,
-                onClear = { scope.launch { jobsScreenModel.clearJobs() } },
-                onDelete = { scope.launch { jobsScreenModel.delete(it) } })
-        }
-    }
-
-    @Composable
-    fun JobContent(jobs: List<ConversionJob>, onDelete: (String) -> Unit, onClear: () -> Unit) {
-        Card(
-            modifier = Modifier.width(width = 900.dp).fillMaxHeight().padding(20.dp)
-        ) {
-            Column(modifier = padding) {
-                Row {
-                    Text(
-                        text = "Jobs",
-                        fontSize = 30.sp,
-                        modifier = padding,
-                        textAlign = TextAlign.Center,
-                    )
-                }
-                Column {
-                    jobs.forEach { job -> JobItem(job) { onDelete(job.jobId) } }
-                }
-                Row(modifier = Modifier.fillMaxSize()) {
-                    Spacer(modifier = Modifier.weight(1f))
-                    ElevatedButton(onClick = onClear, modifier = padding) {
-                        Text("Clear Completed")
-                    }
-                    Spacer(modifier = Modifier.weight(1f))
-                }
-            }
-        }
-    }
-
-    @Composable
-    fun JobItem(job: ConversionJob, onDelete: () -> Unit) {
-        Column {
-            val progressPadding = Modifier.padding(8.dp).fillMaxWidth()
-            OutlinedCard(
-                modifier = Modifier.padding(16.dp, 4.dp).fillMaxWidth()
-            ) {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Column(modifier = Modifier.weight(1f).padding(8.dp)) {
-                        Text(job.file.fileName, modifier = paddingSmall)
-                        when (job.status) {
-                            Starting -> LinearProgressIndicator(modifier = progressPadding)
-                            InProgress -> LinearProgressIndicator(
-                                progress = { job.progress / 100.0f },
-                                modifier = progressPadding,
-                            )
-
-                            Completed -> Text(
-                                "Completed",
-                                style = MaterialTheme.typography.labelSmall,
-                                modifier = paddingSmall
-                            )
-
-                            Failed -> Text(
-                                "Failed",
-                                style = MaterialTheme.typography.labelSmall,
-                                color = MaterialTheme.colorScheme.error,
-                                modifier = paddingSmall
-                            )
-
-                            Queued -> Text(
-                                "Queued",
-                                style = MaterialTheme.typography.labelSmall,
-                                modifier = paddingSmall
-                            )
-                        }
-                    }
-                    if (job.status !in listOf(Failed, Completed)) {
-                        IconButton(onClick = onDelete) {
-                            Icon(Icons.Sharp.Close, "Cancel")
-                        }
+                if (job.status !in listOf(Failed, Completed)) {
+                    IconButton(onClick = onDelete) {
+                        Icon(Icons.Sharp.Close, "Cancel")
                     }
                 }
             }
         }
     }
+}
 

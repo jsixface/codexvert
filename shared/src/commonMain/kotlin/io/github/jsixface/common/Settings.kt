@@ -8,5 +8,11 @@ data class Settings(
     val libraryLocations: List<String> = listOf(),
     val workspaceLocation: String = "/tmp/vid-con",
     val videoExtensions: List<String> = listOf("avi", "mp4", "mkv", "mpeg4"),
+    val autoConversion: AutoConversion = AutoConversion(),
+)
+
+@Serializable
+data class AutoConversion(
     val watchDuration: Duration? = null,
+    val conversion: Map<String, String> = mapOf("ac3" to "aac"),
 )

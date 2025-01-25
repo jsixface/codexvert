@@ -14,9 +14,9 @@ class SettingsApi(private val watchers: Watchers) {
         val savedData = SavedData.load()
         val oldSettings = savedData.settings
         logger.info("Replacing old settings $oldSettings with new $settings")
-        settings.watchDuration?.let {
-            if (it != oldSettings.watchDuration) {
-                watchers.startWatching(it)
+        settings.autoConversion.watchDuration?.let {
+            if (it != oldSettings.autoConversion.watchDuration) {
+                watchers.startWatching(settings.autoConversion)
             }
         } ?: watchers.stopWatching()
         savedData.copy(settings = settings).save()

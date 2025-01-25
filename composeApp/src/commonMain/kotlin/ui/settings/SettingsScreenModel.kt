@@ -1,4 +1,4 @@
-package viewmodels
+package ui.settings
 
 import io.github.jsixface.common.Api
 import io.github.jsixface.common.Settings
