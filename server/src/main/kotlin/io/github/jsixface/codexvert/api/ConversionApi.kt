@@ -161,7 +161,8 @@ class ConversionApi {
 
     private fun conversionParams(convSpecs: Map<MediaTrack, Conversion>, file: VideoFile): List<String> {
         val result = mutableListOf<String>()
-        val missingTracks = (file.subtitles + file.videos + file.audios).filter { it !in convSpecs.keys }
+        val convIndices = convSpecs.keys.map { it.index }
+        val missingTracks = (file.subtitles + file.videos + file.audios).filter { it.index !in convIndices }
         val copyTracks = missingTracks.map { it to Conversion.Copy }
         val allConversion = convSpecs + copyTracks
         allConversion.toList().forEachIndexed { i, (track, conv) ->

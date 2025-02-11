@@ -6,7 +6,6 @@ import io.github.jsixface.codexvert.db.VideoEntity
 import io.github.jsixface.codexvert.db.VideoFileEntity
 import io.github.jsixface.codexvert.ffprobe.ProbeStream
 import io.github.jsixface.common.MediaTrack
-import io.github.jsixface.common.TrackType
 import io.github.jsixface.common.VideoFile
 import org.jetbrains.exposed.sql.transactions.transaction
 
@@ -56,8 +55,11 @@ fun VideoFileEntity.toVideoFile(): VideoFile = transaction {
     )
 }
 
-private fun VideoEntity.toMediaTrack() = MediaTrack(TrackType.Video, index, codec)
+private fun VideoEntity.toMediaTrack() = MediaTrack.VideoTrack(
+    codec, index, codecTag, profile, resolution, aspectRatio, frameRate, bitRate, bitDepth, pixelFormat
+)
 
-private fun AudioEntity.toMediaTrack() = MediaTrack(TrackType.Audio, index, codec)
+private fun AudioEntity.toMediaTrack() =
+    MediaTrack.AudioTrack(codec, index, channels, layout, bitrate, sampleRate, language)
 
-private fun SubtitleEntity.toMediaTrack() = MediaTrack(TrackType.Subtitle, index, codec)
+private fun SubtitleEntity.toMediaTrack() = MediaTrack.SubtitleTrack(codec, index, language)

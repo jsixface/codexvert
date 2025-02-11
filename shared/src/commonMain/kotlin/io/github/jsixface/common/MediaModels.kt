@@ -39,11 +39,49 @@ enum class TrackType {
 }
 
 @Serializable
-data class MediaTrack(
-    val type: TrackType,
-    val index: Int,
-    val codec: String
-)
+sealed class MediaTrack {
+    abstract val codec: String
+    abstract val index: Int
+
+    override fun toString(): String {
+        return "[$index:${codec.uppercase()}]"
+    }
+
+    @Serializable
+    @SerialName("video")
+    class VideoTrack(
+        override val codec: String,
+        override val index: Int,
+        val codecTag: String,
+        val profile: String,
+        val resolution: String,
+        val aspectRatio: String,
+        val frameRate: Float,
+        val bitRate: Int,
+        val bitDepth: Int,
+        val pixelFormat: String,
+    ) : MediaTrack()
+
+    @Serializable
+    @SerialName("audio")
+    class AudioTrack(
+        override val codec: String,
+        override val index: Int,
+        val channels: Int,
+        val layout: String,
+        val bitRate: Int,
+        val sampleRate: String,
+        val language: String,
+    ) : MediaTrack()
+
+    @Serializable
+    @SerialName("subtitle")
+    class SubtitleTrack(
+        override val codec: String,
+        override val index: Int,
+        val language: String
+    ) : MediaTrack()
+}
 
 fun MediaTrack.isDolby() = codec.lowercase() in listOf("ac3", "eac3")
 

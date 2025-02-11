@@ -4,8 +4,6 @@ import androidx.compose.runtime.Composable
 import io.github.jsixface.common.AutoConversion
 import io.github.jsixface.common.ConversionJob
 import io.github.jsixface.common.JobStatus
-import io.github.jsixface.common.MediaTrack
-import io.github.jsixface.common.TrackType
 import io.github.jsixface.common.VideoFile
 import ui.BackupContent
 import ui.JobContent
@@ -22,12 +20,12 @@ private val videos = listOf(
         "Friends.S05E01.DVDrip.XviD-SAiNTS.avi",
         234,
         audios = listOf(
-            MediaTrack(TrackType.Audio, 0, "mp3"),
-            MediaTrack(TrackType.Audio, 1, "aac")
+//            MediaTrack(TrackType.Audio, 0, "mp3"),
+//            MediaTrack(TrackType.Audio, 1, "aac")
         ),
         videos = listOf(
-            MediaTrack(TrackType.Video, 0, "hevc"),
-            MediaTrack(TrackType.Video, 1, "mp4")
+//            MediaTrack(TrackType.Video, 0, "hevc"),
+//            MediaTrack(TrackType.Video, 1, "mp4")
         )
     ),
     VideoFile(
@@ -35,12 +33,12 @@ private val videos = listOf(
         "Friends.S05E02.DVDrip.XviD-SAiNTS.avi",
         234,
         audios = listOf(
-            MediaTrack(TrackType.Audio, 0, "mp3"),
-            MediaTrack(TrackType.Audio, 1, "aac")
+//            MediaTrack(TrackType.Audio, 0, "mp3"),
+//            MediaTrack(TrackType.Audio, 1, "aac")
         ),
         videos = listOf(
-            MediaTrack(TrackType.Video, 0, "hevc"),
-            MediaTrack(TrackType.Video, 1, "mp4")
+//            MediaTrack(TrackType.Video, 0, "hevc"),
+//            MediaTrack(TrackType.Video, 1, "mp4")
         )
     )
 )
