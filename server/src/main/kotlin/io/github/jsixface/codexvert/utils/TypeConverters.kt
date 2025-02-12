@@ -56,7 +56,7 @@ fun VideoFileEntity.toVideoFile(): VideoFile = transaction {
 }
 
 private fun VideoEntity.toMediaTrack() = MediaTrack.VideoTrack(
-    codec, index, codecTag, profile, resolution, aspectRatio, frameRate, bitRate, bitDepth, pixelFormat
+    codec, index, codecTag, profile, resolution, aspectRatio, frameRate ?: 0f, bitRate, bitDepth, pixelFormat
 )
 
 private fun AudioEntity.toMediaTrack() =

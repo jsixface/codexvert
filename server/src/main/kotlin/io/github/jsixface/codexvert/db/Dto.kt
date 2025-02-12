@@ -13,7 +13,7 @@ object VideosTable : IntIdTable() {
     val profile = varchar("profile", 50)
     val resolution = varchar("resolution", 50)
     val aspectRatio = varchar("aspect_ratio", 20)
-    val frameRate = float("frame_rate")
+    val frameRate = float("frame_rate").nullable()
     val bitRate = integer("bit_rate")
     val bitDepth = integer("bit_depth")
     val pixelFormat = varchar("pixel_format", 50)
