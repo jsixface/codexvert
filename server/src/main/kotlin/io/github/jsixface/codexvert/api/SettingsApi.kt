@@ -5,20 +5,19 @@ import io.github.jsixface.codexvert.plugins.Watchers
 import io.github.jsixface.common.Settings
 
 
-class SettingsApi(private val watchers: Watchers) {
+class SettingsApi(private val watchers: Watchers, private val preferences: IPreferences) {
     private val logger = logger()
 
-    fun getSettings(): Settings = SavedData.load().settings
+    fun getSettings(): Settings = preferences.getSettings()
 
     fun saveSettings(settings: Settings) {
-        val savedData = SavedData.load()
-        val oldSettings = savedData.settings
+        val oldSettings = preferences.getSettings()
         logger.info("Replacing old settings $oldSettings with new $settings")
         settings.autoConversion.watchDuration?.let {
-            if (it != oldSettings.autoConversion.watchDuration) {
+            if (settings.autoConversion != oldSettings.autoConversion) {
                 watchers.startWatching(settings.autoConversion)
             }
         } ?: watchers.stopWatching()
-        savedData.copy(settings = settings).save()
+        preferences.saveSettings(settings)
     }
 }

@@ -2,7 +2,9 @@ package io.github.jsixface.codexvert.plugins
 
 import io.github.jsixface.codexvert.api.BackupApi
 import io.github.jsixface.codexvert.api.ConversionApi
+import io.github.jsixface.codexvert.api.IPreferences
 import io.github.jsixface.codexvert.api.JobsApi
+import io.github.jsixface.codexvert.api.Preferences
 import io.github.jsixface.codexvert.api.SettingsApi
 import io.github.jsixface.codexvert.api.VideoApi
 import io.github.jsixface.codexvert.db.IVideoFilesRepo
@@ -22,13 +24,14 @@ import org.koin.logger.slf4jLogger
 fun Application.configureKoin() {
     val koinModule = module {
         single<Database> { getDb() }
-        singleOf(::VideoFilesRepo) bind IVideoFilesRepo::class
-        singleOf(::Parser) bind IParser::class
-        singleOf(::VideoApi)
         singleOf(::BackupApi)
         singleOf(::ConversionApi)
         singleOf(::JobsApi)
+        singleOf(::Parser) bind IParser::class
+        singleOf(::Preferences) bind IPreferences::class
         singleOf(::SettingsApi)
+        singleOf(::VideoApi)
+        singleOf(::VideoFilesRepo) bind IVideoFilesRepo::class
         singleOf(::Watchers) { createdAtStart() }
     }
 

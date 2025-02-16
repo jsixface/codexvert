@@ -1,4 +1,4 @@
-package io.github.jsixface.route
+package io.github.jsixface.codexvert.route
 
 import io.github.jsixface.codexvert.api.SettingsApi
 import io.github.jsixface.codexvert.logger

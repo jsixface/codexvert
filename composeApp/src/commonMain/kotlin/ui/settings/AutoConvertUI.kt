@@ -14,7 +14,6 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -24,6 +23,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import io.github.jsixface.common.AutoConversion
+import io.github.jsixface.common.Codec
+import io.github.jsixface.common.TrackType
 import ui.utils.ComboBox
 import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.minutes
@@ -33,8 +34,6 @@ fun AutoConvertSettings(
     setting: AutoConversion, modifier: Modifier = Modifier, onChanged: (AutoConversion) -> Unit = {}
 ) {
     Column(modifier = modifier) {
-        var newFrom by remember { mutableStateOf("") }
-        var newTo by remember { mutableStateOf("") }
         Text(
             "Auto Conversion",
             style = MaterialTheme.typography.headlineMedium,
@@ -44,11 +43,11 @@ fun AutoConvertSettings(
             Row(
                 verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(16.dp, 4.dp).fillMaxWidth()
             ) {
-                Row(modifier = Modifier.weight(1f), horizontalArrangement = Arrangement.Center) { Text(from) }
+                Row(modifier = Modifier.weight(1f), horizontalArrangement = Arrangement.Center) { Text(from.name) }
                 Row(
                     modifier = Modifier.weight(1f), horizontalArrangement = Arrangement.Center
                 ) { Icon(Icons.AutoMirrored.Rounded.ArrowForward, "To") }
-                Row(modifier = Modifier.weight(1f), horizontalArrangement = Arrangement.Center) { Text(to) }
+                Row(modifier = Modifier.weight(1f), horizontalArrangement = Arrangement.Center) { Text(to.name) }
                 FilledTonalButton(modifier = Modifier.padding(start = 10.dp), onClick = {
                     onChanged(setting.copy(conversion = setting.conversion - from))
                 }) {
@@ -57,22 +56,29 @@ fun AutoConvertSettings(
             }
         }
         Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(16.dp, 4.dp).fillMaxWidth()) {
+            var selectedFrom by remember { mutableStateOf<Codec?>(null) }
+            var selectedTo by remember { mutableStateOf<Codec?>(null) }
+            val addEnabled = selectedFrom != selectedTo && selectedTo != null && selectedFrom != null
+            val audioCodecs = Codec.entries.filter { it.type == TrackType.Audio }
+            val fromCodecs = audioCodecs.filterNot { setting.conversion.keys.contains(it) }
+
             Row(modifier = Modifier.weight(1f)) {
-                TextField(
-                    value = newFrom, onValueChange = { newFrom = it },
-                    label = { Text("From") })
+                ComboBox("From", fromCodecs, selectedFrom, optionName = { name }, onSelect = { selectedFrom = it })
             }
             Row(modifier = Modifier.weight(1f), horizontalArrangement = Arrangement.Center) {
                 Icon(Icons.AutoMirrored.Rounded.ArrowForward, "To")
             }
             Row(modifier = Modifier.weight(1f)) {
-                TextField(value = newTo, onValueChange = { newTo = it }, label = { Text("To") })
+                ComboBox("To", audioCodecs, selectedTo, optionName = { name }, onSelect = { selectedTo = it })
             }
-            OutlinedButton(modifier = Modifier.padding(start = 10.dp), onClick = {
-                onChanged(setting.copy(conversion = setting.conversion + mapOf(newFrom to newTo)))
-                newFrom = ""
-                newTo = ""
-            }) {
+            OutlinedButton(
+                modifier = Modifier.padding(start = 10.dp),
+                enabled = addEnabled,
+                onClick = {
+                    onChanged(setting.copy(conversion = setting.conversion + mapOf(selectedFrom!! to selectedTo!!)))
+                    selectedTo = null
+                    selectedFrom = null
+                }) {
                 Icon(Icons.Filled.Add, "Add")
             }
         }

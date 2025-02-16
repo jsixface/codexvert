@@ -3,7 +3,9 @@ package io.github.jsixface.codexvert.db
 import io.github.jsixface.codexvert.ffprobe.ProbeInfo
 import io.github.jsixface.codexvert.ffprobe.ProbeStream
 import io.github.jsixface.codexvert.logger
+import io.github.jsixface.codexvert.utils.toVideoFile
 import io.github.jsixface.codexvert.utils.updateInfo
+import io.github.jsixface.common.VideoFile
 import kotlinx.coroutines.Dispatchers
 import kotlinx.datetime.Clock
 import org.jetbrains.exposed.sql.Database
@@ -15,11 +17,12 @@ import kotlin.io.path.getLastModifiedTime
 
 
 interface IVideoFilesRepo {
-    suspend fun getAll(): List<VideoFileEntity>
+    suspend fun getAllEntities(): List<VideoFileEntity>
+    suspend fun getAllVideoFiles(): List<VideoFile>
     suspend fun get(id: Int): VideoFileEntity?
     suspend fun getFile(path: Path): VideoFileEntity?
     suspend fun delete(id: Int)
-    suspend fun update(videoInfo: ProbeInfo, entity: VideoFileEntity): Boolean
+    suspend fun update(videoInfo: ProbeInfo, entity: VideoFileEntity, file: Path): Boolean
     suspend fun create(videoInfo: ProbeInfo, file: Path): VideoFileEntity
 }
 
@@ -29,7 +32,11 @@ class VideoFilesRepo(private val db: Database) : IVideoFilesRepo {
     private suspend fun <T> dbQuery(block: suspend () -> T): T =
         newSuspendedTransaction(Dispatchers.IO) { block() }
 
-    override suspend fun getAll() = dbQuery { VideoFileEntity.all().toList() }
+    override suspend fun getAllEntities() = dbQuery { VideoFileEntity.all().toList() }
+
+    override suspend fun getAllVideoFiles(): List<VideoFile> {
+        return getAllEntities().map { it.toVideoFile() }
+    }
 
     override suspend fun get(id: Int) = dbQuery { VideoFileEntity.findById(id) }
 
@@ -91,12 +98,16 @@ class VideoFilesRepo(private val db: Database) : IVideoFilesRepo {
         }
     }
 
-    override suspend fun update(videoInfo: ProbeInfo, entity: VideoFileEntity) = dbQuery {
+    override suspend fun update(videoInfo: ProbeInfo, entity: VideoFileEntity, file: Path) = dbQuery {
         try {
             entity.videoStream.forEach { it.delete() }
             entity.audioStreams.forEach { it.delete() }
             entity.subtitles.forEach { it.delete() }
             videoInfo.streams.forEach { createStream(it, entity) }
+            with(entity) {
+                sizeMb = file.fileSize().toInt() / 1024 / 1024
+                modified = file.getLastModifiedTime().toMillis()
+            }
             true
         } catch (e: Exception) {
             false

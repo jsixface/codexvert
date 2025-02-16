@@ -14,5 +14,5 @@ data class Settings(
 @Serializable
 data class AutoConversion(
     val watchDuration: Duration? = null,
-    val conversion: Map<String, String> = mapOf("ac3" to "aac"),
+    val conversion: Map<Codec, Codec> = mapOf(Codec.AAC to Codec.AAC),
 )

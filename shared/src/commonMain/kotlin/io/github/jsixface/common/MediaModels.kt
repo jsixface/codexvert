@@ -3,11 +3,14 @@ package io.github.jsixface.common
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
+@Serializable
 enum class Codec(
     val type: TrackType,
     val ffmpegParams: List<String> = emptyList(),
 ) {
     AAC(TrackType.Audio, listOf("aac")),
+    AC3(TrackType.Audio, listOf("ac3")),
+    EAC3(TrackType.Audio, listOf("eac3")),
     Opus(TrackType.Audio, listOf("libopus", "-b:a", "128K")),
     MP3(TrackType.Audio, listOf("mp3", "-b:a", "128K")),
     HEVC(TrackType.Video, listOf("libx265")),

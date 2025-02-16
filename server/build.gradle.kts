@@ -20,12 +20,12 @@ dependencies {
     implementation(libs.kotlinx.datetime)
     implementation(libs.kotlinx.json)
     implementation(libs.bundles.koin.server)
+    testImplementation(libs.junit)
 
     runtimeOnly(libs.sqlite)
 
 //    testImplementation(libs.ktor.server.tests)
-    testImplementation(libs.kotlin.test.junit)
-    testImplementation(libs.bundles.koin.test)
+    testImplementation(libs.bundles.server.test)
 }
 
 val staticDir = "$projectDir/static"

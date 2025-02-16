@@ -28,11 +28,11 @@ import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 
-class ConversionApi {
+class ConversionApi(preferences: IPreferences) {
     private val logger = logger()
     private val scope = CoroutineScope(Dispatchers.IO + SupervisorJob())
     val jobs = mutableListOf<ConvertingJob>()
-    private val workspace = File(SavedData.load().settings.workspaceLocation)
+    private val workspace = File(preferences.getSettings().workspaceLocation)
 
     init {
         if (workspace.isDirectory.not()) {

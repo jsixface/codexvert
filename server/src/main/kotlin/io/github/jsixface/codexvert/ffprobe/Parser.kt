@@ -25,7 +25,7 @@ class Parser(private val repo: IVideoFilesRepo) : IParser {
         if (entity == null) {
             repo.create(p, file)
         } else {
-            repo.update(p, entity)
+            repo.update(p, entity, file)
         }
     }
 
@@ -36,7 +36,7 @@ class Parser(private val repo: IVideoFilesRepo) : IParser {
                 .filter { extensions.contains(it.extension.lowercase()) }
         }.associateWith { it.getLastModifiedTime().toMillis() }
             .mapKeys { it.key.toAbsolutePath().toString() }
-        val entries = repo.getAll().associateBy { it.path }
+        val entries = repo.getAllEntities().associateBy { it.path }
 
         val deleted = entries - videos.keys
         val modified = videos.filter { it.value != entries[it.key]?.modified }

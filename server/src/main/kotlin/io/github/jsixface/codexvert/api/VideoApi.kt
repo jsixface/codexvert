@@ -10,20 +10,20 @@ import io.github.jsixface.common.VideoList
 import java.nio.file.Path
 
 
-class VideoApi(private val parser: IParser, private val repo: IVideoFilesRepo) {
+class VideoApi(private val parser: IParser, private val repo: IVideoFilesRepo, private val preferences: IPreferences) {
 
     private val logger = logger()
     private var cache = emptyList<VideoFile>()
 
     suspend fun updateCache() {
         logger.info("${this::class.simpleName} updateCache()")
-        cache = repo.getAll().map { it.toVideoFile() }
+        cache = repo.getAllVideoFiles()
     }
 
     suspend fun refreshDirs(): Boolean {
         logger.info("Refreshing videos...")
-        val data = SavedData.load()
-        val refreshed = parser.parseAll(data.settings.libraryLocations, data.settings.videoExtensions)
+        val settings = preferences.getSettings()
+        val refreshed = parser.parseAll(settings.libraryLocations, settings.videoExtensions)
         if (refreshed) updateCache()
         return refreshed
     }
