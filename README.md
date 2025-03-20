@@ -4,10 +4,11 @@ CodeXvert is a modern web application built with Kotlin Multiplatform that simpl
 
 ## Features
 
-- **Video Library Management**: Organize and search your video files with support for various file extensions like AVI, MP4, MKV, and MPEG4.
+- **Video Library Management**: Configure your library directory to search your video files and display the codec
+  information.
 - **Codec Filtering**: Filter your videos based on video and audio codecs for better organization and easy identification.
-- **Transcoding**: Convert between different video and audio codecs with a simple interface. Supported codecs include H.264, VP9, AAC, MP3, Opus, and Vorbis (among others).
-- **Multi-Platform Support**: CodeXvert is built with Kotlin Multiplatform, allowing it to run on the Web, Desktop, and Server environments.
+- **Transcoding**: Convert between different video and audio codecs with a simple interface. Supported codecs include
+  H.264, H.265, AAC, MP3, Opus, AC3 and EAC3.
 - **Background Monitoring**: Automatically monitor and manage your video library in the background, ensuring your
   library is always up-to-date.
 
@@ -28,7 +29,7 @@ To get started with CodeXvert, you can either run the application locally or dep
 CodeXvert is available as a Docker image on the GitHub Container Registry. You can pull and run the latest image with the following command:
 
 ```bash
-docker run -d -p 8080:8080 ghcr.io/jsixface/codexvert:latest
+docker run -d --rm --name codexvert -p 8080:8080 ghcr.io/jsixface/codexvert:latest
 ```
 This will start the CodeXvert application and expose it on http://localhost:8080.
 
@@ -36,9 +37,9 @@ This will start the CodeXvert application and expose it on http://localhost:8080
 
 [//]: # (![Video Files]&#40;docs/1_video_files.png&#41;)
 <img src="docs/1_video_files.png" width="500">
-<img src="docs/2_video_options.png" width="500">
-<img src="docs/3_jobs.png" width="500">
 <img src="docs/2_settings.png" width="500">
+<img src="docs/3_jobs.png" width="500">
+<img src="docs/4_backups.png" width="500">
 
 ## License
 
