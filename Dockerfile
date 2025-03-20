@@ -1,4 +1,4 @@
-FROM eclipse-temurin:21-jre-alpine
+FROM bellsoft/liberica-runtime-container:jre-21
 
 ENV BIND=0.0.0.0
 EXPOSE 8080
