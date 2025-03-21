@@ -26,10 +26,34 @@ To get started with CodeXvert, you can either run the application locally or dep
 
 ### Docker Deployment
 
-CodeXvert is available as a Docker image on the GitHub Container Registry. You can pull and run the latest image with the following command:
+CodeXvert is available as a Docker image on the GitHub Container Registry. You can pull and run the latest image with
+the below command.
 
+The indexed data about the files and their codecs are stored in `/app/data/codex.db`. This should be mounted if you like
+the `ffprobe` parsing should be persisted.
 ```bash
-docker run -d --rm --name codexvert -p 8080:8080 ghcr.io/jsixface/codexvert:latest
+docker run -d --rm \
+  --name codexvert \
+  -v ./data:/app/data \
+  -v /media:/media \
+  -p 8080:8080 \
+  ghcr.io/jsixface/codexvert:latest
+```
+
+#### Compose
+
+```yaml
+ services:
+     codexvert:
+         container_name: codexvert
+         image: ghcr.io/jsixface/codexvert:latest
+         restart: unless-stopped
+         ports:
+             - 8080:8080
+         volumes:
+             - ./data:/app/data
+             - /media:/media
+             - /etc/localtime:/etc/localtime:ro
 ```
 This will start the CodeXvert application and expose it on http://localhost:8080.
 
