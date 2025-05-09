@@ -1,4 +1,4 @@
-FROM bellsoft/liberica-runtime-container:jre-21-cds-slim-musl
+FROM bellsoft/liberica-openjdk-alpine:21
 
 ENV BIND=0.0.0.0
 EXPOSE 8080
