@@ -19,6 +19,12 @@ dependencyResolutionManagement {
     }
 }
 
+buildCache {
+    local {
+        directory = File(rootDir, "build-cache")
+    }
+}
+
 include(":composeApp")
 include(":server")
 include(":shared")

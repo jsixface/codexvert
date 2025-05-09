@@ -117,7 +117,11 @@ fun HomeScreen() {
                     PageContent(
                         videoList,
                         updateFilter = { audioCodec, videoCodec -> load(audioCodec, videoCodec) },
-                        videoSelected = { navigator.navigateTo(ListDetailPaneScaffoldRole.Detail, it) }) {
+                        videoSelected = {
+                            scope.launch {
+                                navigator.navigateTo(ListDetailPaneScaffoldRole.Detail, it)
+                            }
+                        }) {
                         scope.launch {
                             loading = true
                             viewModel.refresh()
@@ -129,10 +133,12 @@ fun HomeScreen() {
         },
         detailPane = {
             AnimatedPane {
-                navigator.currentDestination?.content?.let { v ->
+                navigator.currentDestination?.contentKey?.let { v ->
                     FileDetails(v) { conv ->
-                        conv?.let { scope.launch { viewModel.submitJob(v, conv) } }
-                        navigator.navigateBack()
+                        scope.launch {
+                            conv?.let { viewModel.submitJob(v, conv) }
+                            navigator.navigateBack()
+                        }
                     }
                 }
             }

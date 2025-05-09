@@ -19,7 +19,19 @@ kotlin {
                 outputFileName = "composeApp.js"
             }
         }
-        binaries.executable()
+        val output = binaries.executable()
+        output.forEach {
+            println(
+                """
+                ---
+                ${it.name} -> name
+                ${it.mainFileName.get()} -> mailfilename
+                ${it.target.outputModuleName} -> outputModule name
+                ${it.mainFile.get().asFile.name} -> mailFile name
+                ${it.distribution.outputDirectory.get()} -> distributionOutputDirectory
+                """.trimIndent()
+            )
+        }
     }
     
     jvm("desktop")
