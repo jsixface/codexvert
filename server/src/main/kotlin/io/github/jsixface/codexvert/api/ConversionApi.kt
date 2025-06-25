@@ -14,7 +14,6 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
-import kotlinx.datetime.Clock.System
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
@@ -24,9 +23,11 @@ import java.io.UncheckedIOException
 import java.nio.file.Files
 import java.util.UUID
 import kotlin.io.path.Path
+import kotlin.time.Clock
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
+import kotlin.time.ExperimentalTime
 
 class ConversionApi(preferences: IPreferences) {
     private val logger = logger()
@@ -104,10 +105,11 @@ class ConversionApi(preferences: IPreferences) {
         if (process.waitFor() == 0) moveFiles(file, outFile)
     }
 
+    @OptIn(ExperimentalTime::class)
     private fun moveFiles(file: VideoFile, outFile: File) {
         logger.info("Move file to location")
         try {
-            val bkpFile = Path("${file.path}.${System.now().epochSeconds}.bkp")
+            val bkpFile = Path("${file.path}.${Clock.System.now().epochSeconds}.bkp")
             logger.info("   Backing up ${file.path}")
             Files.move(Path(file.path), bkpFile)
             logger.info("   Move ${outFile.path} to ${file.path}")
@@ -187,12 +189,12 @@ class ConversionApi(preferences: IPreferences) {
     }
 }
 
-data class ConvertingJob(
+data class ConvertingJob @OptIn(ExperimentalTime::class) constructor(
     val videoFile: VideoFile,
     val convSpecs: Map<MediaTrack, Conversion>,
     val outFile: File,
     var job: Job?,
     val progress: MutableStateFlow<Int> = MutableStateFlow(0),
     val jobId: String,
-    val startedAt: LocalDateTime = System.now().toLocalDateTime(TimeZone.currentSystemDefault())
+    val startedAt: LocalDateTime = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault())
 )

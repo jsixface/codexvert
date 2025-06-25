@@ -1,7 +1,7 @@
 plugins {
     alias(libs.plugins.kotlinJvm)
     alias(libs.plugins.kotlinSerialization)
-    alias(libs.plugins.ktor)
+    alias(ktorLibs.plugins.ktor)
     application
 }
 
@@ -15,12 +15,20 @@ dependencies {
     implementation(projects.shared)
     implementation(libs.logback)
     implementation(libs.logstash.logback.encoder)
-    implementation(libs.bundles.ktor.server)
     implementation(libs.bundles.database)
     implementation(libs.kotlinx.datetime)
     implementation(libs.kotlinx.json)
     implementation(libs.bundles.koin.server)
     testImplementation(libs.junit)
+
+    // Ktor
+    implementation(ktorLibs.server.core)
+    implementation(ktorLibs.server.netty)
+    implementation(ktorLibs.server.resources)
+    implementation(ktorLibs.server.contentNegotiation)
+    implementation(ktorLibs.server.config.yaml)
+    implementation(ktorLibs.serialization.kotlinx.json)
+    implementation(ktorLibs.serialization.kotlinx.cbor)
 
     runtimeOnly(libs.sqlite)
 

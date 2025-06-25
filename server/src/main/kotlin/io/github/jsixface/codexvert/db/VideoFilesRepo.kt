@@ -7,13 +7,14 @@ import io.github.jsixface.codexvert.utils.toVideoFile
 import io.github.jsixface.codexvert.utils.updateInfo
 import io.github.jsixface.common.VideoFile
 import kotlinx.coroutines.Dispatchers
-import kotlinx.datetime.Clock
 import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.transactions.experimental.newSuspendedTransaction
 import java.nio.file.Path
 import kotlin.io.path.absolutePathString
 import kotlin.io.path.fileSize
 import kotlin.io.path.getLastModifiedTime
+import kotlin.time.Clock
+import kotlin.time.ExperimentalTime
 
 
 interface IVideoFilesRepo {
@@ -44,6 +45,7 @@ class VideoFilesRepo(private val db: Database) : IVideoFilesRepo {
         VideoFileEntity.find { VideoFilesTable.path eq path.toAbsolutePath().toString() }.firstOrNull()
     }
 
+    @OptIn(ExperimentalTime::class)
     override suspend fun create(videoInfo: ProbeInfo, file: Path): VideoFileEntity {
         return dbQuery {
             val v = VideoFileEntity.new {

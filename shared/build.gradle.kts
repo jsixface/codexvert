@@ -15,7 +15,7 @@ kotlin {
     
     sourceSets {
         commonMain.dependencies {
-            implementation(libs.ktor.resources)
+            implementation(ktorLibs.resources)
             implementation(libs.kotlinx.datetime)
         }
     }

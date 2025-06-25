@@ -4,6 +4,7 @@
             <option name="env">
                 <map>
                     <entry key="BIND" value="0.0.0.0"/>
+                    <entry key="DEVELOPER_DIR" value="/Applications/Xcode.app/Contents/Developer"/>
                 </map>
             </option>
             <option name="executionName"/>

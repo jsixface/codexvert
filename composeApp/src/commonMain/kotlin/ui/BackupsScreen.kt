@@ -33,12 +33,13 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.launch
-import kotlinx.datetime.Instant
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
 import org.koin.compose.koinInject
 import ui.model.ModelState
 import viewmodels.BackupScreenViewModel
+import kotlin.time.ExperimentalTime
+import kotlin.time.Instant
 
 private val padding = Modifier.padding(16.dp)
 private val paddingSmall = Modifier.padding(8.dp)
@@ -113,6 +114,7 @@ fun BackupContent(backups: List<String>, onDelete: (String) -> Unit, onClear: ()
     }
 }
 
+@OptIn(ExperimentalTime::class)
 @Composable
 fun BackupItem(backup: String, onDelete: () -> Unit) {
     Column {

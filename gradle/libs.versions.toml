@@ -1,21 +1,20 @@
 [versions]
-compose-plugin = "1.8.0"
-exposed-version = "0.60.0"
-junit = "4.13.1"
-koin = "4.1.0-Beta8"
-kotlin = "2.1.20"
+compose-plugin = "1.8.1"
+exposed-version = "0.61.0"
+junit = "4.13.2"
+koin = "4.1.0"
+kotlin = "2.2.0"
 kotlinx-coroutines = "1.10.2"
-kotlinx-datetime = "0.6.2"
+kotlinx-datetime = "0.7.0"
 kotlinx-serialization = "1.8.1"
-ksp = "2.1.20-2.0.1"
-ktor = "3.1.3"
-liquibase = "4.30.0"
-logback = "1.5.15"
-logstash-logback-encoder = "8.0"
-material3-adaptive = "1.1.0"
+ksp = "2.2.0-2.0.2"
+liquibase = "4.32.0"
+logback = "1.5.18"
+logstash-logback-encoder = "8.1"
+material3-adaptive = "1.1.2"
 mockito = "5.4.0"
 napier = "2.7.1"
-sqlite = "3.47.1.0"
+sqlite = "3.50.1.0"
 
 [libraries]
 exposed-core = { module = "org.jetbrains.exposed:exposed-core", version.ref = "exposed-version" }
@@ -25,7 +24,7 @@ exposed-json = { module = "org.jetbrains.exposed:exposed-json", version.ref = "e
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 koin-compose = { module = "io.insert-koin:koin-compose", version.ref = "koin" }
 koin-core = { module = "io.insert-koin:koin-core", version.ref = "koin" }
-koin-ktor = { module = "io.insert-koin:koin-ktor3", version.ref = "koin" }
+koin-ktor = { module = "io.insert-koin:koin-ktor", version.ref = "koin" }
 koin-log = { module = "io.insert-koin:koin-logger-slf4j", version.ref = "koin" }
 koin-test = { module = "io.insert-koin:koin-test", version.ref = "koin" }
 koin-test-junit4 = { module = "io.insert-koin:koin-test-junit4", version.ref = "koin" }
@@ -34,21 +33,6 @@ kotlinx-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-c
 kotlinx-coroutines-swing = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-swing", version.ref = "kotlinx-coroutines" }
 kotlinx-datetime = { module = "org.jetbrains.kotlinx:kotlinx-datetime", version.ref = "kotlinx-datetime" }
 kotlinx-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinx-serialization" }
-ktor-client-cio = { module = "io.ktor:ktor-client-cio", version.ref = "ktor" }
-ktor-client-content-negotiation = { module = "io.ktor:ktor-client-content-negotiation", version.ref = "ktor" }
-ktor-client-core = { module = "io.ktor:ktor-client-core", version.ref = "ktor" }
-ktor-client-js = { module = "io.ktor:ktor-client-js", version.ref = "ktor" }
-ktor-client-logging = { module = "io.ktor:ktor-client-logging", version.ref = "ktor" }
-ktor-client-resources = { module = "io.ktor:ktor-client-resources", version.ref = "ktor" }
-ktor-resources = { module = "io.ktor:ktor-resources", version.ref = "ktor" }
-ktor-serialization-kotlinx-cbor = { module = "io.ktor:ktor-serialization-kotlinx-cbor", version.ref = "ktor" }
-ktor-serialization-kotlinx-json = { module = "io.ktor:ktor-serialization-kotlinx-json", version.ref = "ktor" }
-ktor-server-config-yaml = { module = "io.ktor:ktor-server-config-yaml", version.ref = "ktor" }
-ktor-server-content-negotiation = { module = "io.ktor:ktor-server-content-negotiation", version.ref = "ktor" }
-ktor-server-core = { module = "io.ktor:ktor-server-core-jvm", version.ref = "ktor" }
-ktor-server-netty = { module = "io.ktor:ktor-server-netty-jvm", version.ref = "ktor" }
-ktor-server-resources = { module = "io.ktor:ktor-server-resources", version.ref = "ktor" }
-ktor-server-tests = { module = "io.ktor:ktor-server-tests-jvm", version.ref = "ktor" }
 liquibase-core = { module = "org.liquibase:liquibase-core", version.ref = "liquibase" }
 logback = { module = "ch.qos.logback:logback-classic", version.ref = "logback" }
 logstash-logback-encoder = { module = "net.logstash.logback:logstash-logback-encoder", version.ref = "logstash-logback-encoder" }
@@ -83,22 +67,7 @@ server-test = [
     "kotlin-test-junit",
     "mockito",
 ]
-ktor-client = [
-    "ktor-client-core",
-    "ktor-client-logging",
-    "ktor-client-content-negotiation",
-    "ktor-serialization-kotlinx-cbor",
-    "ktor-client-resources"
-]
-ktor-server = [
-    "ktor-server-core",
-    "ktor-server-netty",
-    "ktor-server-resources",
-    "ktor-server-config-yaml",
-    "ktor-serialization-kotlinx-json",
-    "ktor-serialization-kotlinx-cbor",
-    "ktor-server-content-negotiation"
-]
+
 material3-adaptive = [
     "material3-adaptive",
     "material3-adaptive-layout",
@@ -113,4 +82,3 @@ kotlinJvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
 kotlinMultiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
 kotlinSerialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
 ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
-ktor = { id = "io.ktor.plugin", version.ref = "ktor" }

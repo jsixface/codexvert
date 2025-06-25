@@ -9,11 +9,10 @@ plugins {
     alias(libs.plugins.ksp)
 }
 
-
 kotlin {
     @OptIn(ExperimentalWasmDsl::class)
     wasmJs {
-        moduleName = "composeApp"
+        outputModuleName = "composeApp"
         browser {
             commonWebpackConfig {
                 outputFileName = "composeApp.js"
@@ -54,17 +53,24 @@ kotlin {
             implementation(libs.kotlinx.datetime)
             implementation(libs.napier)
             implementation(libs.bundles.koin.client)
-            implementation(libs.bundles.ktor.client)
+
+            // Ktor
+            implementation(ktorLibs.client.core)
+            implementation(ktorLibs.client.logging)
+            implementation(ktorLibs.client.contentNegotiation)
+            implementation(ktorLibs.client.resources)
+            implementation(ktorLibs.serialization.kotlinx.cbor)
+
             implementation(kotlin("reflect"))
         }
         desktopMain.dependencies {
             implementation(compose.desktop.currentOs)
             implementation(libs.kotlinx.coroutines.swing)
-            implementation(libs.ktor.client.cio)
+            implementation(ktorLibs.client.cio)
             implementation(libs.logback)
         }
         wasmJsMain.dependencies {
-            implementation(libs.ktor.client.js)
+            implementation(ktorLibs.client.js)
         }
     }
 }
