@@ -7,11 +7,11 @@ import io.github.jsixface.common.Codec
 import io.github.jsixface.common.Conversion
 import io.github.jsixface.common.MediaTrack
 import io.github.jsixface.common.VideoFile
-import kotlinx.datetime.Clock
 import org.junit.Test
-
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
+import kotlin.time.Clock
+import kotlin.time.ExperimentalTime
 
 class WatchersTest {
 
@@ -35,6 +35,7 @@ class WatchersTest {
         )
     }
 
+    @OptIn(ExperimentalTime::class)
     private fun videoFile(fileName: String, vararg codecs: String): VideoFile {
         val audios = codecs.mapIndexed { i, c ->
             MediaTrack.AudioTrack(c, i, 2, "", 0, "", "eng")

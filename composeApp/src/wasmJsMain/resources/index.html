@@ -3,10 +3,161 @@
 <head>
     <meta charset="UTF-8">
     <title>Codecs Conversion</title>
-    <script type="application/javascript" src="skiko.js"></script>
+    <style>
+        #loading {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: #f5f5f5;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .progress-container {
+            width: 300px;
+            margin-top: 20px;
+        }
+
+        .progress-bar {
+            height: 20px;
+            background-color: #4CAF50;
+            width: 0%;
+            border-radius: 4px;
+            transition: width 0.3s;
+        }
+
+        .progress-text {
+            margin-top: 10px;
+            text-align: center;
+            font-family: Arial, sans-serif;
+        }
+    </style>
+    <script>
+        // Function to perform HEAD request and get file size
+        async function getFileSize(url) {
+            try {
+                const response = await fetch(url, {method: 'HEAD'});
+                if (response.ok) {
+                    return parseInt(response.headers.get('content-length') || '0');
+                }
+                return 0;
+            } catch (error) {
+                console.error('Error getting file size:', error);
+                return 0;
+            }
+        }
+
+        // Function to update progress bar
+        function updateProgress(loaded, total) {
+            if (total <= 0) return;
+
+            const percent = Math.min(100, Math.round((loaded / total) * 100));
+            const progressBar = document.getElementById('progress-bar');
+            const progressText = document.getElementById('progress-text');
+
+            if (progressBar) progressBar.style.width = percent + '%';
+            if (progressText) progressText.textContent = `Loading: ${percent}% (${formatBytes(loaded)} / ${formatBytes(total)})`;
+        }
+
+        // Function to format bytes to human-readable format
+        function formatBytes(bytes) {
+            if (bytes === 0) return '0 Bytes';
+
+            const k = 1024;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+        }
+
+        // Track loading progress
+        let totalLoaded = 0;
+        let totalSize = 0;
+        let filesLoaded = 0;
+        const filesToLoad = 1; // composeApp.wasm only
+
+        // Original fetch function
+        const originalFetch = window.fetch;
+
+        // Override fetch to track progress
+        window.fetch = async function (resource, options) {
+            const url = resource instanceof Request ? resource.url : resource;
+
+            // Only track .wasm files
+            if (typeof url === 'string' && url.endsWith('.wasm')) {
+                const response = await originalFetch(resource, options);
+
+                // Get the total size
+                const contentLength = parseInt(response.headers.get('content-length') || '0');
+
+                if (contentLength > 0) {
+                    totalSize += contentLength;
+
+                    // Clone the response to read the body
+                    const clone = response.clone();
+
+                    // Create a reader to track download progress
+                    const reader = clone.body.getReader();
+                    let receivedLength = 0;
+
+                    // Read the response body
+                    const processChunk = async ({done, value}) => {
+                        if (done) {
+                            totalLoaded += receivedLength;
+                            filesLoaded++;
+
+                            updateProgress(totalLoaded, totalSize);
+
+                            // If all files are loaded, hide the loading indicator after a short delay
+                            if (filesLoaded >= filesToLoad) {
+                                setTimeout(() => {
+                                    const loadingElement = document.getElementById('loading');
+                                    if (loadingElement) {
+                                        loadingElement.style.opacity = '0';
+                                        setTimeout(() => {
+                                            loadingElement.style.display = 'none';
+                                        }, 300);
+                                    }
+                                }, 500);
+                            }
+
+                            return;
+                        }
+
+                        // Update progress
+                        receivedLength += value.length;
+                        updateProgress(totalLoaded + receivedLength, totalSize);
+
+                        // Continue reading
+                        return reader.read().then(processChunk);
+                    };
+
+                    // Start reading
+                    reader.read().then(processChunk);
+                }
+
+                return response;
+            }
+
+            // For non-wasm files, use the original fetch
+            return originalFetch(resource, options);
+        };
+    </script>
     <script type="application/javascript" src="composeApp.js"></script>
 </head>
 <body>
+<div id="loading">
+    <h2>Loading Application</h2>
+    <div class="progress-container">
+        <div id="progress-bar" class="progress-bar"></div>
+    </div>
+    <div id="progress-text" class="progress-text">Loading: 0%</div>
+</div>
 <canvas id="ComposeTarget"></canvas>
 </body>
 </html>
