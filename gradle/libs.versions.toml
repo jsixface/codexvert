@@ -1,20 +1,20 @@
 [versions]
-compose-plugin = "1.8.1"
+compose-plugin = "1.8.2"
 exposed-version = "0.61.0"
 junit = "4.13.2"
 koin = "4.1.0"
 kotlin = "2.2.0"
 kotlinx-coroutines = "1.10.2"
-kotlinx-datetime = "0.7.0"
-kotlinx-serialization = "1.8.1"
+kotlinx-datetime = "0.7.1"
+kotlinx-serialization = "1.9.0"
 ksp = "2.2.0-2.0.2"
-liquibase = "4.32.0"
+liquibase = "4.33.0"
 logback = "1.5.18"
 logstash-logback-encoder = "8.1"
 material3-adaptive = "1.1.2"
-mockito = "5.4.0"
+mockito = "6.0.0"
 napier = "2.7.1"
-sqlite = "3.50.1.0"
+sqlite = "3.50.3.0"
 
 [libraries]
 exposed-core = { module = "org.jetbrains.exposed:exposed-core", version.ref = "exposed-version" }
