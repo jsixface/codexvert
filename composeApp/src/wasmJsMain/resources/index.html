@@ -36,23 +36,18 @@
             text-align: center;
             font-family: Arial, sans-serif;
         }
+
+        html, body, #ComposeTarget {
+            width: 100%;
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+        }
     </style>
     <script>
-        // Function to perform HEAD request and get file size
-        async function getFileSize(url) {
-            try {
-                const response = await fetch(url, {method: 'HEAD'});
-                if (response.ok) {
-                    return parseInt(response.headers.get('content-length') || '0');
-                }
-                return 0;
-            } catch (error) {
-                console.error('Error getting file size:', error);
-                return 0;
-            }
-        }
 
-        // Function to update progress bar
+        // Function to update the progress bar
         function updateProgress(loaded, total) {
             if (total <= 0) return;
 
@@ -158,6 +153,6 @@
     </div>
     <div id="progress-text" class="progress-text">Loading: 0%</div>
 </div>
-<canvas id="ComposeTarget"></canvas>
+<div id="ComposeTarget"></div>
 </body>
 </html>

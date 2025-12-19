@@ -22,6 +22,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -58,6 +59,7 @@ fun SettingsScreen() {
         val extensions = remember { mutableStateListOf<String>() }
         val locations = remember { mutableStateListOf<String>() }
         var autoConversion by remember { mutableStateOf(AutoConversion()) }
+        var takeBackups by remember { mutableStateOf(true) }
 
 
 //        if (getClientConfig().isDebugEnabled()) {
@@ -91,6 +93,7 @@ fun SettingsScreen() {
                             extensions.addAll(extsToAdd)
                             workspace = settings.workspaceLocation
                             autoConversion = settings.autoConversion
+                            takeBackups = settings.takeBackups
                         }
                     }
                 }
@@ -118,6 +121,15 @@ fun SettingsScreen() {
                     label = { Text("Workspace Location") })
                 HorizontalDivider()
                 AutoConvertSettings(autoConversion) { autoConversion = it }
+                HorizontalDivider()
+                Row(
+                    modifier = Modifier.fillMaxWidth().padding(16.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Text("Take Backups", style = MaterialTheme.typography.bodyLarge)
+                    Switch(checked = takeBackups, onCheckedChange = { takeBackups = it })
+                }
             }
             Row(modifier = Modifier.fillMaxSize(), horizontalArrangement = Arrangement.SpaceEvenly) {
                 Button(onClick = {
@@ -127,7 +139,8 @@ fun SettingsScreen() {
                                 libraryLocations = locations,
                                 workspaceLocation = workspace,
                                 videoExtensions = extensions,
-                                autoConversion = autoConversion
+                                autoConversion = autoConversion,
+                                takeBackups = takeBackups
                             )
                         )
                     }

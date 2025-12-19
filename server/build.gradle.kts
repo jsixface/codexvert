@@ -38,28 +38,16 @@ dependencies {
 
 val staticDir = "$projectDir/static"
 
-val copyDevToStatic by tasks.registering {
+val copyDevToStatic by tasks.registering(Sync::class) {
     dependsOn(":composeApp:wasmJsBrowserDevelopmentExecutableDistribution")
-    doLast {
-        val webArtifactsDir = "$rootDir/composeApp/build/dist/wasmJs/developmentExecutable"
-        delete(staticDir)
-        copy {
-            from(webArtifactsDir)
-            into(staticDir)
-        }
-    }
+    from("$rootDir/composeApp/build/dist/wasmJs/developmentExecutable")
+    into(staticDir)
 }
 
-val copyProdToStatic by tasks.registering {
+val copyProdToStatic by tasks.registering(Sync::class) {
     dependsOn(":composeApp:wasmJsBrowserDistribution")
-    doLast {
-        val webArtifactsDir = "$rootDir/composeApp/build/dist/wasmJs/productionExecutable"
-        delete(staticDir)
-        copy {
-            from(webArtifactsDir)
-            into(staticDir)
-        }
-    }
+    from("$rootDir/composeApp/build/dist/wasmJs/productionExecutable")
+    into(staticDir)
 }
 
 tasks.register("runWebUI") { dependsOn(copyDevToStatic, "run") }

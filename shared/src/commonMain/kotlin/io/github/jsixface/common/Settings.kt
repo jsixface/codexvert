@@ -9,6 +9,7 @@ data class Settings(
     val workspaceLocation: String = "/tmp/vid-con",
     val videoExtensions: List<String> = listOf("avi", "mp4", "mkv", "mpeg4"),
     val autoConversion: AutoConversion = AutoConversion(),
+    val takeBackups: Boolean = true,
 )
 
 @Serializable

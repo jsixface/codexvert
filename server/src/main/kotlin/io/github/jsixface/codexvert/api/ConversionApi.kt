@@ -29,7 +29,7 @@ import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 import kotlin.time.ExperimentalTime
 
-class ConversionApi(preferences: IPreferences) {
+class ConversionApi(private val preferences: IPreferences) {
     private val logger = logger()
     private val scope = CoroutineScope(Dispatchers.IO + SupervisorJob())
     val jobs = mutableListOf<ConvertingJob>()
@@ -109,9 +109,14 @@ class ConversionApi(preferences: IPreferences) {
     private fun moveFiles(file: VideoFile, outFile: File) {
         logger.info("Move file to location")
         try {
-            val bkpFile = Path("${file.path}.${Clock.System.now().epochSeconds}.bkp")
-            logger.info("   Backing up ${file.path}")
-            Files.move(Path(file.path), bkpFile)
+            if (preferences.getSettings().takeBackups) {
+                val bkpFile = Path("${file.path}.${Clock.System.now().epochSeconds}.bkp")
+                logger.info("   Backing up ${file.path}")
+                Files.move(Path(file.path), bkpFile)
+            } else {
+                logger.info("   Deleting ${file.path}")
+                Files.deleteIfExists(Path(file.path))
+            }
             logger.info("   Move ${outFile.path} to ${file.path}")
             Files.move(outFile.toPath(), Path(file.path))
             logger.info("   Delete workspace dir. ${outFile.parent}")
