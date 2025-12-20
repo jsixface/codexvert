@@ -7,12 +7,10 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.ArrowForward
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.rounded.Delete
 import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -33,61 +31,76 @@ import kotlin.time.Duration.Companion.minutes
 fun AutoConvertSettings(
     setting: AutoConversion, modifier: Modifier = Modifier, onChanged: (AutoConversion) -> Unit = {}
 ) {
-    Column(modifier = modifier) {
-        Text(
-            "Auto Conversion",
-            style = MaterialTheme.typography.headlineMedium,
-            modifier = Modifier.padding(vertical = 16.dp)
+    Column(modifier = modifier, verticalArrangement = Arrangement.spacedBy(16.dp)) {
+        val durations = listOf(1.minutes, 5.minutes, 10.minutes, 15.minutes, 30.minutes, 1.hours)
+        ComboBox(
+            "Media Scan Duration",
+            durations,
+            setting.watchDuration,
+            modifier = Modifier.fillMaxWidth(),
+            optionName = {
+                val mins = inWholeMinutes
+                if (mins >= 60) "${mins / 60} hour${if (mins / 60 > 1) "s" else ""}"
+                else "$mins mins"
+            },
+            onSelect = { onChanged(setting.copy(watchDuration = it)) }
         )
-        setting.conversion.forEach { (from, to) ->
-            Row(
-                verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(16.dp, 4.dp).fillMaxWidth()
-            ) {
-                Row(modifier = Modifier.weight(1f), horizontalArrangement = Arrangement.Center) { Text(from.name) }
+
+        Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+            setting.conversion.forEach { (from, to) ->
                 Row(
-                    modifier = Modifier.weight(1f), horizontalArrangement = Arrangement.Center
-                ) { Icon(Icons.AutoMirrored.Rounded.ArrowForward, "To") }
-                Row(modifier = Modifier.weight(1f), horizontalArrangement = Arrangement.Center) { Text(to.name) }
-                FilledTonalButton(modifier = Modifier.padding(start = 10.dp), onClick = {
-                    onChanged(setting.copy(conversion = setting.conversion - from))
-                }) {
-                    Icon(Icons.Filled.Delete, "Delete")
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    Text(from.name, modifier = Modifier.weight(1f))
+                    Icon(Icons.AutoMirrored.Rounded.ArrowForward, "To")
+                    Text(to.name, modifier = Modifier.weight(1f))
+                    IconButton(onClick = {
+                        onChanged(setting.copy(conversion = setting.conversion - from))
+                    }) {
+                        Icon(Icons.Rounded.Delete, "Delete")
+                    }
                 }
             }
         }
-        Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(16.dp, 4.dp).fillMaxWidth()) {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier.padding(vertical = 4.dp).fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
             var selectedFrom by remember { mutableStateOf<Codec?>(null) }
             var selectedTo by remember { mutableStateOf<Codec?>(null) }
             val addEnabled = selectedFrom != selectedTo && selectedTo != null && selectedFrom != null
             val audioCodecs = Codec.entries.filter { it.type == TrackType.Audio }
             val fromCodecs = audioCodecs.filterNot { setting.conversion.keys.contains(it) }
 
-            Row(modifier = Modifier.weight(1f)) {
-                ComboBox("From", fromCodecs, selectedFrom, optionName = { name }, onSelect = { selectedFrom = it })
-            }
-            Row(modifier = Modifier.weight(1f), horizontalArrangement = Arrangement.Center) {
-                Icon(Icons.AutoMirrored.Rounded.ArrowForward, "To")
-            }
-            Row(modifier = Modifier.weight(1f)) {
-                ComboBox("To", audioCodecs, selectedTo, optionName = { name }, onSelect = { selectedTo = it })
-            }
-            OutlinedButton(
-                modifier = Modifier.padding(start = 10.dp),
+            ComboBox(
+                "From",
+                fromCodecs,
+                selectedFrom,
+                modifier = Modifier.weight(1f),
+                optionName = { name },
+                onSelect = { selectedFrom = it })
+            Icon(Icons.AutoMirrored.Rounded.ArrowForward, "To")
+            ComboBox(
+                "To",
+                audioCodecs,
+                selectedTo,
+                modifier = Modifier.weight(1f),
+                optionName = { name },
+                onSelect = { selectedTo = it })
+            FilledTonalButton(
+                modifier = Modifier.padding(start = 4.dp),
                 enabled = addEnabled,
                 onClick = {
                     onChanged(setting.copy(conversion = setting.conversion + mapOf(selectedFrom!! to selectedTo!!)))
                     selectedTo = null
                     selectedFrom = null
                 }) {
-                Icon(Icons.Filled.Add, "Add")
+                Text("Add")
             }
         }
-        ComboBox(
-            title = "Media Scan Duration",
-            options = listOf(1.minutes, 5.minutes, 15.minutes, 30.minutes, 1.hours),
-            modifier = Modifier.padding(16.dp).fillMaxWidth(),
-            selected = setting.watchDuration
-        ) { onChanged(setting.copy(watchDuration = it)) }
     }
 
 }
