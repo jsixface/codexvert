@@ -2,9 +2,23 @@ package io.github.jsixface.codexvert.api
 
 import io.github.jsixface.codexvert.logger
 import io.github.jsixface.common.Conversion
+import io.github.jsixface.common.ConversionJob
+import io.github.jsixface.common.JobStatus
 import io.github.jsixface.common.MediaTrack
 import io.github.jsixface.common.VideoFile
 import io.ktor.utils.io.CancellationException
+import java.io.File
+import java.io.InputStream
+import java.io.UncheckedIOException
+import java.nio.file.Files
+import java.util.UUID
+import kotlin.io.path.Path
+import kotlin.time.Clock
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.milliseconds
+import kotlin.time.Duration.Companion.seconds
+import kotlin.time.ExperimentalTime
+import kotlin.time.measureTime
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -17,19 +31,11 @@ import kotlinx.coroutines.launch
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
-import java.io.File
-import java.io.InputStream
-import java.io.UncheckedIOException
-import java.nio.file.Files
-import java.util.UUID
-import kotlin.io.path.Path
-import kotlin.time.Clock
-import kotlin.time.Duration
-import kotlin.time.Duration.Companion.milliseconds
-import kotlin.time.Duration.Companion.seconds
-import kotlin.time.ExperimentalTime
 
-class ConversionApi(private val preferences: IPreferences) {
+class ConversionApi(
+    private val preferences: IPreferences,
+    private val jobsRepo: io.github.jsixface.codexvert.db.IJobsRepo
+) {
     private val logger = logger()
     private val scope = CoroutineScope(Dispatchers.IO + SupervisorJob())
     val jobs = mutableListOf<ConvertingJob>()
@@ -47,17 +53,34 @@ class ConversionApi(private val preferences: IPreferences) {
                     if (jobs.none { it.job?.isActive == true }) {
                         logger.info("Starting conversion for ${nextJob.videoFile}")
                         with(nextJob) {
-                            job = launch { startJob(videoFile, convSpecs, outFile, progress) }
+                            job = launch {
+                                val duration = measureTime {
+                                    startJob(videoFile, convSpecs, outFile, progress)
+                                }
+                                val status = if (progress.value == 100) JobStatus.Completed else JobStatus.Failed
+                                val startedTimeStr = "${startedAt.date} ${
+                                    startedAt.time.hour.toString().padStart(2, '0')
+                                }:${
+                                    startedAt.time.minute.toString().padStart(2, '0')
+                                }:${startedAt.time.second.toString().padStart(2, '0')}"
+                                jobsRepo.save(
+                                    ConversionJob(
+                                        jobId = jobId,
+                                        status = status,
+                                        progress = progress.value,
+                                        file = videoFile,
+                                        startedAt = startedTimeStr
+                                    ),
+                                    duration.toIsoString()
+                                )
+                                jobs.remove(nextJob)
+                            }
                         }
                     }
                 }
                 delay(1.seconds)
             }
         }
-    }
-
-    fun clearFinished() {
-        jobs.removeAll { it.progress.value == -1 || it.progress.value == 100 }
     }
 
     fun startConversion(file: VideoFile, convSpecs: Map<MediaTrack, Conversion>): Boolean {

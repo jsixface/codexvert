@@ -7,7 +7,9 @@ import io.github.jsixface.codexvert.api.JobsApi
 import io.github.jsixface.codexvert.api.Preferences
 import io.github.jsixface.codexvert.api.SettingsApi
 import io.github.jsixface.codexvert.api.VideoApi
+import io.github.jsixface.codexvert.db.IJobsRepo
 import io.github.jsixface.codexvert.db.IVideoFilesRepo
+import io.github.jsixface.codexvert.db.JobsRepo
 import io.github.jsixface.codexvert.db.VideoFilesRepo
 import io.github.jsixface.codexvert.db.getDb
 import io.github.jsixface.codexvert.ffprobe.IParser
@@ -32,6 +34,7 @@ fun Application.configureKoin() {
         singleOf(::SettingsApi)
         singleOf(::VideoApi)
         singleOf(::VideoFilesRepo) bind IVideoFilesRepo::class
+        singleOf(::JobsRepo) bind IJobsRepo::class
         singleOf(::Watchers) { createdAtStart() }
     }
 

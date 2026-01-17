@@ -7,7 +7,6 @@ import io.github.jsixface.codexvert.db.VideoFileEntity
 import io.github.jsixface.codexvert.ffprobe.ProbeStream
 import io.github.jsixface.common.MediaTrack
 import io.github.jsixface.common.VideoFile
-import org.jetbrains.exposed.sql.transactions.transaction
 
 fun VideoEntity.updateInfo(stream: ProbeStream) {
     index = stream.index
@@ -41,11 +40,11 @@ fun AudioEntity.updateInfo(stream: ProbeStream) {
 
 fun Float.shortString() = if (this == toInt().toFloat()) this.toInt().toString() else "%.2f".format(this)
 
-fun VideoFileEntity.toVideoFile(): VideoFile = transaction {
+fun VideoFileEntity.toVideoFile(): VideoFile {
     val videoTracks = videoStream.map { it.toMediaTrack() }
     val audioTracks = audioStreams.map { it.toMediaTrack() }
     val subtitleTracks = subtitles.map { it.toMediaTrack() }
-    VideoFile(
+    return VideoFile(
         path = path,
         fileName = name,
         modifiedTime = modified,

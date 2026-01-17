@@ -23,8 +23,8 @@ sealed interface Api {
     data object Settings : Api
 
     @Resource("/jobs")
-    data object Jobs : Api {
+    data class Jobs(val page: Int = 1, val limit: Int = 10) : Api {
         @Resource("{id}")
-        data class Job(val parent: Jobs = Jobs, val id: String) : Api
+        data class Job(val parent: Jobs = Jobs(), val id: String) : Api
     }
 }

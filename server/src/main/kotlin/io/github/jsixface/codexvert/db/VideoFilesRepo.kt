@@ -6,22 +6,23 @@ import io.github.jsixface.codexvert.logger
 import io.github.jsixface.codexvert.utils.toVideoFile
 import io.github.jsixface.codexvert.utils.updateInfo
 import io.github.jsixface.common.VideoFile
-import kotlinx.coroutines.Dispatchers
-import org.jetbrains.exposed.sql.Database
-import org.jetbrains.exposed.sql.transactions.experimental.newSuspendedTransaction
 import java.nio.file.Path
 import kotlin.io.path.absolutePathString
 import kotlin.io.path.fileSize
 import kotlin.io.path.getLastModifiedTime
 import kotlin.time.Clock
 import kotlin.time.ExperimentalTime
+import kotlinx.coroutines.Dispatchers
+import org.jetbrains.exposed.sql.Database
+import org.jetbrains.exposed.sql.transactions.experimental.newSuspendedTransaction
 
 
 interface IVideoFilesRepo {
     suspend fun getAllEntities(): List<VideoFileEntity>
     suspend fun getAllVideoFiles(): List<VideoFile>
     suspend fun get(id: Int): VideoFileEntity?
-    suspend fun getFile(path: Path): VideoFileEntity?
+    suspend fun getEntity(path: Path): VideoFileEntity?
+    suspend fun getFile(path: Path): VideoFile?
     suspend fun delete(id: Int)
     suspend fun update(videoInfo: ProbeInfo, entity: VideoFileEntity, file: Path): Boolean
     suspend fun create(videoInfo: ProbeInfo, file: Path): VideoFileEntity
@@ -35,14 +36,18 @@ class VideoFilesRepo(private val db: Database) : IVideoFilesRepo {
 
     override suspend fun getAllEntities() = dbQuery { VideoFileEntity.all().toList() }
 
-    override suspend fun getAllVideoFiles(): List<VideoFile> {
-        return getAllEntities().map { it.toVideoFile() }
+    override suspend fun getAllVideoFiles(): List<VideoFile> = dbQuery {
+        VideoFileEntity.all().map { it.toVideoFile() }
     }
 
     override suspend fun get(id: Int) = dbQuery { VideoFileEntity.findById(id) }
 
-    override suspend fun getFile(path: Path) = dbQuery {
+    override suspend fun getEntity(path: Path): VideoFileEntity? = dbQuery {
         VideoFileEntity.find { VideoFilesTable.path eq path.toAbsolutePath().toString() }.firstOrNull()
+    }
+
+    override suspend fun getFile(path: Path): VideoFile? = dbQuery {
+        getEntity(path)?.toVideoFile()
     }
 
     @OptIn(ExperimentalTime::class)

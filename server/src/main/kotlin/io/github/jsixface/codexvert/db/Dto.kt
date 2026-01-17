@@ -97,3 +97,23 @@ class VideoFileEntity(id: EntityID<Int>) : IntEntity(id) {
     var modified by VideoFilesTable.modified
     var added by VideoFilesTable.added
 }
+
+object CompletedJobsTable : IntIdTable("CompletedJobs") {
+    val jobId = varchar("job_id", 255).uniqueIndex()
+    val status = varchar("status", 20)
+    val filePath = varchar("file_path", 500)
+    val fileName = varchar("file_name", 255)
+    val startedAt = varchar("started_at", 50)
+    val duration = varchar("duration", 50)
+}
+
+class CompletedJobEntity(id: EntityID<Int>) : IntEntity(id) {
+    companion object : IntEntityClass<CompletedJobEntity>(CompletedJobsTable)
+
+    var jobId by CompletedJobsTable.jobId
+    var status by CompletedJobsTable.status
+    var filePath by CompletedJobsTable.filePath
+    var fileName by CompletedJobsTable.fileName
+    var startedAt by CompletedJobsTable.startedAt
+    var duration by CompletedJobsTable.duration
+}

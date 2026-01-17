@@ -8,7 +8,8 @@ data class ConversionJob(
     val status: JobStatus,
     val progress: Int,
     val file: VideoFile,
-    val startedAt: String
+    val startedAt: String,
+    val duration: String? = null
 )
 
 enum class JobStatus {

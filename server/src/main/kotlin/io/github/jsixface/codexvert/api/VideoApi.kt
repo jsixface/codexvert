@@ -3,7 +3,6 @@ package io.github.jsixface.codexvert.api
 import io.github.jsixface.codexvert.db.IVideoFilesRepo
 import io.github.jsixface.codexvert.ffprobe.IParser
 import io.github.jsixface.codexvert.logger
-import io.github.jsixface.codexvert.utils.toVideoFile
 import io.github.jsixface.common.CodecsCollection
 import io.github.jsixface.common.VideoFile
 import io.github.jsixface.common.VideoList
@@ -36,7 +35,7 @@ class VideoApi(private val parser: IParser, private val repo: IVideoFilesRepo, p
     }
 
     suspend fun getVideo(path: String): VideoFile? {
-        return repo.getFile(Path.of(path))?.toVideoFile()
+        return repo.getFile(Path.of(path))
     }
 
     private fun getCodecsPresent(videoFiles: List<VideoFile>): CodecsCollection {

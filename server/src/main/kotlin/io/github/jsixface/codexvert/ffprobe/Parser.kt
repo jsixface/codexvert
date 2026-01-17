@@ -21,7 +21,7 @@ class Parser(private val repo: IVideoFilesRepo) : IParser {
 
     override suspend fun parseVideoFile(file: Path) {
         val p = ProbeUtils.parseMediaInfo(file) ?: return
-        val entity = repo.getFile(file)
+        val entity = repo.getEntity(file)
         if (entity == null) {
             repo.create(p, file)
         } else {

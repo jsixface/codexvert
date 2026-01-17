@@ -13,13 +13,9 @@ fun Route.jobRoutes() {
     val jobsApi by inject<JobsApi>()
     val logger = logger()
 
-    get<Api.Jobs> {
-        val jobs = jobsApi.getJobs()
+    get<Api.Jobs> { jobsReq ->
+        val jobs = jobsApi.getJobs(jobsReq.page, jobsReq.limit)
         call.respond(jobs)
-    }
-
-    delete<Api.Jobs> {
-        call.respond(jobsApi.clearFinished())
     }
 
     delete<Api.Jobs.Job> { job ->

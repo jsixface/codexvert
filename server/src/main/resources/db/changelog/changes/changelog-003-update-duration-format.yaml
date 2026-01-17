@@ -1,0 +1,10 @@
+databaseChangeLog:
+  - changeSet:
+      id: update-duration-format
+      author: Junie
+      changes:
+        - renameColumn:
+            tableName: CompletedJobs
+            oldColumnName: duration_ms
+            newColumnName: duration
+            columnDataType: varchar(50)
