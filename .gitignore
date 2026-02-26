@@ -1,5 +1,6 @@
 *.iml
 .gradle
+gradle-cache
 **/build/
 xcuserdata
 !src/**/build/
@@ -18,3 +19,4 @@ captures
 /server/static/
 /.kotlin
 *.db
+/.vscode/settings.json
