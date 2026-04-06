@@ -20,3 +20,6 @@ captures
 /.kotlin
 *.db
 /.vscode/settings.json
+build-cache/
+/server/bin/
+/composeApp/bin/
