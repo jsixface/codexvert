@@ -24,28 +24,13 @@ import io.github.jsixface.common.AutoConversion
 import io.github.jsixface.common.Codec
 import io.github.jsixface.common.TrackType
 import ui.utils.ComboBox
-import kotlin.time.Duration.Companion.hours
-import kotlin.time.Duration.Companion.minutes
+
 
 @Composable
 fun AutoConvertSettings(
     setting: AutoConversion, modifier: Modifier = Modifier, onChanged: (AutoConversion) -> Unit = {}
 ) {
     Column(modifier = modifier, verticalArrangement = Arrangement.spacedBy(16.dp)) {
-        val durations = listOf(1.minutes, 5.minutes, 10.minutes, 15.minutes, 30.minutes, 1.hours)
-        ComboBox(
-            "Media Scan Duration",
-            durations,
-            setting.watchDuration,
-            modifier = Modifier.fillMaxWidth(),
-            optionName = {
-                val mins = inWholeMinutes
-                if (mins >= 60) "${mins / 60} hour${if (mins / 60 > 1) "s" else ""}"
-                else "$mins mins"
-            },
-            onSelect = { onChanged(setting.copy(watchDuration = it)) }
-        )
-
         Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
             setting.conversion.forEach { (from, to) ->
                 Row(

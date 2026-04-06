@@ -1,17 +1,17 @@
-
 import androidx.compose.desktop.ui.tooling.preview.Preview
 import androidx.compose.runtime.Composable
 import io.github.jsixface.common.AutoConversion
 import io.github.jsixface.common.ConversionJob
 import io.github.jsixface.common.JobStatus
+import io.github.jsixface.common.JobsResponse
 import io.github.jsixface.common.VideoFile
+import kotlin.random.Random
 import ui.BackupContent
 import ui.JobContent
 import ui.settings.AutoConvertSettings
 import ui.settings.BackendDialogContent
 import ui.settings.ListEditor
 import ui.theme.AppTheme
-import kotlin.random.Random
 
 
 private val videos = listOf(
@@ -47,7 +47,7 @@ private val videos = listOf(
 private val jobs = videos.mapIndexed { i, v ->
     ConversionJob(
         Random.nextLong().toHexString(),
-        status = JobStatus.entries.get(i+2),
+        status = JobStatus.entries.get(i + 2),
         progress = Random.nextInt(100),
         v,
         "2023-02-03"
@@ -67,7 +67,12 @@ fun seeSetting() {
 fun seeJobs() {
     AppTheme {
         println(jobs.size)
-        JobContent(jobs, onDelete = {}, onClear = {})
+        JobContent(
+            jobsResponse = JobsResponse(jobs, 1, 10, 10),
+            onPageChange = {},
+            onDelete = {},
+            onItemsPerPageChange = {}
+        )
     }
 }
 
@@ -75,7 +80,7 @@ fun seeJobs() {
 @Preview
 fun seeBackups() {
     AppTheme {
-        val backups = listOf("The-Boys-S03E01-Payback-WEBDL-1080p.mkv.1710158838.bkp" )
+        val backups = listOf("The-Boys-S03E01-Payback-WEBDL-1080p.mkv.1710158838.bkp")
         BackupContent(backups, {}, {})
     }
 }

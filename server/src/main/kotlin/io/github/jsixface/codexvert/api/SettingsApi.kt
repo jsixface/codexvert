@@ -13,11 +13,9 @@ class SettingsApi(private val watchers: Watchers, private val preferences: IPref
     fun saveSettings(settings: Settings) {
         val oldSettings = preferences.getSettings()
         logger.info("Replacing old settings $oldSettings with new $settings")
-        settings.autoConversion.watchDuration?.let {
-            if (settings.autoConversion != oldSettings.autoConversion) {
-                watchers.startWatching(settings.autoConversion)
-            }
-        } ?: watchers.stopWatching()
+        if (settings.autoConversion != oldSettings.autoConversion || settings.libraryLocations != oldSettings.libraryLocations) {
+            watchers.startWatching(settings.autoConversion)
+        }
         preferences.saveSettings(settings)
     }
 }

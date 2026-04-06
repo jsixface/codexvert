@@ -14,7 +14,6 @@ import java.nio.file.Files
 import java.nio.file.Path
 import kotlin.time.Clock
 import kotlin.time.Duration
-import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 import kotlin.time.ExperimentalTime
 import kotlinx.coroutines.delay
@@ -98,7 +97,7 @@ class WatchersTest {
 
     private suspend fun withWatcher(
         autoConversion: AutoConversion = AutoConversion(
-            watchDuration = 10.minutes, conversion = mapOf(Codec.AAC to Codec.MP3)
+            conversion = mapOf(Codec.AAC to Codec.MP3)
         ), block: suspend (Path) -> Unit
     ) {
         val tempDir = Files.createTempDirectory("watchers_test")
